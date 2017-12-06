@@ -5,13 +5,15 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char **argv)
 {
   char mystring[ ] = "aaa,bbb,ccc";
   int index;
 	
-  while( index < sizeof(mystring)){
+  printf("length of mystring: %d\n",strlen(mystring));
+  while( index < strlen(mystring)){
    printf("%d",mystring[index]);
    if ( mystring[index] == 44 ){
    printf("\n");
