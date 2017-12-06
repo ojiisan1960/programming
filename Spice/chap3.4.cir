@@ -1,0 +1,14 @@
+Voltage divider
+v1 3 0 6
+r1 3 2 5k
+r2 2 1 3k
+r3 1 0 2k
+
+
+.dc v1 6 6 1
+* Voltages around 0-1-2-3-0 loop algebraically add to zero:
+.print dc v(1,0) v(2,1) v(3,2) v(0,3)
+* Voltages around 1-2-3-1 loop algebraically add to zero:
+.print dc v(2,1) v(3,2) v(1,3)
+.end
+

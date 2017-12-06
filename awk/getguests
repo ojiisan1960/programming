@@ -1,0 +1,6 @@
+#!/bin/awk -f
+# get all user logins that end with a "_"
+
+BEGIN {
+	print "Users with guest accounts"} 
+        { FS = ":" }  $1 ~ /_$/ { count[users]++ } $1 ~ /_$/ {print "Full name: ",$5,"-","Login: ",$1} END { print "Total number of guest accounts: "count[users]}

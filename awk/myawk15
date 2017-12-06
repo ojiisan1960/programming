@@ -1,0 +1,5 @@
+#!/bin/awk -f
+
+#myawk15
+ $1 == "486"  { computers++ }
+ END     {  printf("The number of 486 computers is %d\n", computers);  }

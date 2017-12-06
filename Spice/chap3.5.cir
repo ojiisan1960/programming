@@ -1,0 +1,12 @@
+Current divider
+v1 1 0
+r1 3 0 2k
+r2 4 0 3k
+r3 5 0 5k
+vitotal 2 1 dc 0
+vir1 2 3 dc 0
+vir2 2 4 dc 0
+vir3 2 5 dc 0
+.dc v1 6 6 1
+.print dc i(vitotal) i(vir1) i(vir2) i(vir3)
+.end

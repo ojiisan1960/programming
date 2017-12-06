@@ -1,0 +1,47 @@
+#!/usr/bin/python
+#Created by Brian Akey
+#bakey@ironkeytech.com
+#Jan 2002
+#v1.0
+#Copy this file into /bin or /usr/bin
+#Add pyshell to /etc/shells
+#Make this your shell
+
+import os,sys
+hist = []
+data = ''
+pt = '~# '
+while data != ['exit']:
+	data = raw_input(os.getcwd() + pt).split(';')
+	for l1 in data:
+		#hist += [l1.strip()]
+		if l1.strip() == 'ls':
+			os.system('ls')
+		elif l1.strip()[:4] == 'echo':
+			os.system(l1.strip())
+		elif l1.strip() == 'hist':
+			del hist[len(hist)-1]
+			for h1 in hist:
+				print h1
+		elif l1.strip() == 'pwd':
+			os.system('pwd')
+		elif l1.strip()[:2] == 'cd':
+			os.chdir(l1.strip()[3:])
+		elif l1.strip()[:3] == 'scp':
+			#open('/var/log/scp.log','a').write(u + ' - ' + ip + ' - ' + l1 + '\n')
+			os.system(l1.strip())
+		elif l1.strip()[:6] == 'groups':
+			os.system('groups')
+		#elif l1.strip()[:7] == 'unalias':
+			#print 'bash: unalias: `' + l1.strip()[7:].strip() + '\' : not an alias'
+		elif l1.strip()[:6] == 'ls -la':
+			os.system('ls -la')
+		elif l1.strip()[0] == '/':
+			os.chdir(l1.strip())
+		else:
+			try:
+				exec(l1.strip())
+			except:
+				os.system(l1.strip())
+sys.exit()
+

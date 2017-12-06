@@ -1,0 +1,17 @@
+     1                                  
+     2                                  section .data
+     3                                  section .text
+     4                                  
+     5                                      global _start
+     6                                  
+     7                                  _start:
+     8 00000000 90                              nop
+     9                                  ; put experiments between nops
+    10 00000001 B803000000                      mov eax,3
+    11 00000006 89C1                    		mov ecx,eax
+    12 00000008 D1E1                    		shl ecx,1
+    13 0000000A 01C1                    		add ecx,eax
+    14                                  ; put experiments between nops
+    15 0000000C 90                              nop
+    16                                  
+    17                                  section .bss

@@ -1,0 +1,14 @@
+#!/bin/awk -f 
+
+#myawk33
+# a while statement to print out each second field only for "286" computers
+
+        BEGIN  { printf("Type\tLoc\tDisk\n")  }
+        /286/  {  field = 1
+                      while(  field  <= NF ) 
+                      {
+                            printf("%s\t", $field )
+                            field += 2
+                       }
+                       print ""
+                   }

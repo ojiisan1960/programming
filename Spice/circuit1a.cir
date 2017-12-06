@@ -1,0 +1,8 @@
+My First Circuit
+v 1 0 
+r 1 0 5
+* the ".dc" statement tells spice to sweep the "v" supply
+* voltage from 0 - 100 v in 5 volt increments
+.dc v 0 100 5
+.print dc v(1) i(v)
+.end

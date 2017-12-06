@@ -1,0 +1,6 @@
+#!/bin/awk -f
+
+#myawk13
+
+        BEGIN   { print "Location of 286 Computers" }
+        $1 == "286"  { print $3 }

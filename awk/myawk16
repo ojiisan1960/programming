@@ -1,0 +1,5 @@
+#!/bin/awk -f
+
+#myawk16, display all x8x computer types
+
+        $1 ~ /[86]/  { print $0 }

@@ -1,0 +1,28 @@
+
+message deferral detail
+-----------------------
+message bounce detail (by relay)
+--------------------------------
+message reject detail
+---------------------
+    Recipient address rejected: Relay access denied
+    Sender address rejected: Access denied
+smtp delivery failures
+----------------------
+  connection refused
+  connection timed out
+  network is unreachable
+  no route to host
+  read timeout
+  server dropped connection
+  server refused mail service
+Warnings
+--------
+  postsuper
+  qmgr
+Fatal Errors: none
+Panics: none
+
+Master daemon messages
+
+Per-Day Traffic Summary

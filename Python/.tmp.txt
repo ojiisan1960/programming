@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>Shakespearean Insulter</title>
+</head>
+<body>
+<center>
+<img src="http://www.pangloss.com/seidel/Shaker/wills2.gif" width="52" height="68" alt="the Bard">
+<p><font size="+2">
+Thou clay-brained guts, thou knotty-pated fool, thou whoreson obscene greasy tallow-catch!</font>
+<p>
+Taken from: <b>Henry IV, part I</b>
+<p>
+<form method="GET" action="http://www.pangloss.com/seidel/Shaker/index.html">
+<input type="submit" value="Insult me again">
+</form>
+<hr>
+Adapted for the Web by <a href="http://www.he.net/~seidel/">Chris Seidel</a>. 
+<p>
+<a href="http://www.pangloss.com/">Wiz Quip</a> |
+<a href="http://www.pangloss.com/Fund/">Fund Predictor</a> |
+<a href="http://www.pangloss.com/seidel/Frac/">Fractals</a> |
+<a href="http://www.pangloss.com/seidel/Poem/">Zenith Poetry</a> |
+<a href="http://www.pangloss.com/seidel/Pegs/">PegBoard</a> |
+<a href="http://www.he.net/~seidel/Converter/index.html">
+Converter</a> | <a href="http://www.he.net/~seidel/">Home</a>
+<br>(insults or wisdom by phone: 1-800-555-TELL ext 1-22263)<br>
+&copy; Copyright 1996
+</center>

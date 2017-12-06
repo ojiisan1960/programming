@@ -1,0 +1,8 @@
+#!/bin/awk -f
+
+#myawk25
+# print each input line preceded with a line number
+# print the heading which includes the name of the file
+
+BEGIN  {  print "File:", FILENAME }
+{ print NR, ":\t", $0 } END { print NR,":",NF,RSTART}

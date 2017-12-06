@@ -1,0 +1,1165 @@
+::::::../badtech.py
+#!/usr/bin/python
+""" badtech.py - simple script for retrieving the latest badtech
+    comic strip.
+    It can be set up as a cron job, useful for those archiving
+    their comic strips. You might want to set the path to where
+    the image gets stored.
+"""
+
+__author__ = 'Dietmar Lang <dietmar@wh.fh-wedel.de>'
+__date__ = '2001/09/09'
+
+
+import urllib, string, time
+
+def filename():
+    """Formats a filename based on the date. A matter of taste.
+    Example for September 2nd, 2001 it will be '2001-09September-02.jpg'"""
+    
+    monthnames = {'1':'January', '2':'February', '3':'March', '4':'April',
+                  '5':'May', '6':'June', '7':'July', '8':'August','9':'September',
+                  '10':'October', '11':'November', '12':'December'}    
+    name = year_long+'-'+string.zfill(month, 2)+monthnames[month]+'-' \
+           +string.zfill(day, 2)+'.jpg'
+    return name
+
+# get the current date
+timetuple = time.localtime(time.time())
+day = `timetuple[2]`
+month = `timetuple[1]`
+year_long = `timetuple[0]`
+year = year_long[-1:]
+  
+url = 'http://www.badtech.com/a/'+year+'/'+month+'/'+day+'.jpg'
+
+print 'Retrieving Badtech comic strip...',
+try:
+    image = urllib.URLopener()
+    image.retrieve(url, filename())
+except:
+    print 'Error during retrieval! Maybe Badtech is no more? ;)'
+else:
+    print 'done.'
+::::::../banner.py
+# Program Name: banner
+# Author: Lloyd Hugh Allen
+# 4 July 2001
+
+from Tkinter import *
+import math
+
+class Flag:
+    def __init__(self, font_size=12):
+        self.theHeight = 300
+        self.theWidth = 1.9 * self.theHeight
+        self.make_window( )
+    
+        self.drawflag( )
+
+    def make_window(self):
+        self.root = Tk( )
+        self.root.title('Banner')
+
+        self.cv = Canvas(self.root, width = self.theWidth, height = self.theHeight,
+                         bg = 'white')
+        self.cv.pack( )
+
+    def stripes(self):
+        self.theStripes = []
+        for count in range(13):
+            if count % 2 == 0:
+                self.theStripes.append(self.cv.create_rectangle(0, count*self.theHeight/13.0,
+                                                     self.theWidth, (count+1)*self.theHeight/13.0,
+                                                     fill = 'red', outline = ''))
+            else:
+                self.theStripes.append(self.cv.create_rectangle(0, count*self.theHeight/13.0,
+                                                     self.theWidth, (count+1)*self.theHeight/13.0,
+                                                     fill = 'white', outline = ''))
+    def star(self, x_loc, y_loc):
+        return self.cv.create_polygon(
+            x_loc + 0.0308*self.theHeight*math.cos(math.pi*198/180), y_loc + 0.0308*self.theHeight*math.sin(math.pi*198/180),
+            x_loc + 0.0308*self.theHeight*math.cos(math.pi*54/180), y_loc + 0.0308*self.theHeight*math.sin(math.pi*54/180),
+            x_loc + 0.0308*self.theHeight*math.cos(math.pi*270/180), y_loc + 0.0308*self.theHeight*math.sin(math.pi*270/180),
+            x_loc + 0.0308*self.theHeight*math.cos(math.pi*126/180), y_loc + 0.0308*self.theHeight*math.sin(math.pi*126/180),
+            x_loc + 0.0308*self.theHeight*math.cos(math.pi*342/180), y_loc + 0.0308*self.theHeight*math.sin(math.pi*342/180),
+            fill = "white")
+    def stars(self):
+        self.theStars = []
+        for acrossCount in range (6):
+            self.theStars.append([])
+            for downCount in range(5):
+                self.theStars[acrossCount].append(self.star(self.theHeight*(.063 + .126*acrossCount),
+                                                            self.theHeight*(.054 + .108*downCount)))
+        self.theOtherStars = []
+        for acrossCount in range(5):
+            self.theOtherStars.append([])
+            for downCount in range(4):
+                self.theOtherStars[acrossCount].append(self.star(self.theHeight*(.126 + .126*acrossCount),
+                                                                 self.theHeight*(.108 + .108*downCount)))
+        pass
+    def field(self):
+	self.thefield = self.cv.create_rectangle( 0, 0,
+                    0.4 * self.theWidth, (7. / 13) * self.theHeight,
+                    fill = 'blue', outline = '')
+    def drawflag(self):
+        self.stripes( )
+        self.field( )
+        self.stars( )
+        pass
+
+if __name__ == '__main__':
+	newFlag = Flag( )
+
+::::::../count.py
+#!/usr/bin/env python2
+
+#
+# Count the number of lines, characters, words, and occurences of each word in a
+# file.  A word is delimted by whitespace and punctuation (as defined by the
+# builting string.whitespace and string.punctuation variables).
+#
+
+import sys
+import string
+import re
+
+# initialize the counters
+linecount = 0
+charcount = 0
+wordcount = 0
+# this is where I will store the total count of each word
+words     = { }
+
+
+# iterate over each line on stdin
+for line in sys.stdin.readlines() :
+    linecount += 1
+    charcount += len( line )
+
+    # remove leading and trailing whitespace
+    line = string.strip( line ) 
+
+    # split the string into a list of words
+    # a word is delimited by whitespace or punctuation
+    for word in re.split(
+            "[" + string.whitespace + string.punctuation + "]+" ,
+            line ) :
+
+        # make the word lower case
+        word = string.lower( word )
+
+        # check to make sure the string is considered a word
+        if re.match( "^[" + string.lowercase + "]+$" , word ) :
+            wordcount += 1
+
+            # if the word has been found before, increment its count
+            # otherwise initialize its count to 1
+            if words.has_key( word ) :
+                words[ word ] += 1
+            else :
+                words[ word ] = 1
+
+        
+# Now print out the results of the count:
+print
+print "Number of lines:" , linecount
+print "Total word count:" , wordcount
+print "Total character count:" , charcount
+print
+
+# print each word and its count in sorted order
+sorted_word_list = words.keys()
+sorted_word_list.sort()
+
+for word in sorted_word_list :
+    print word , ":" , words[ word ]
+
+::::::../env.py
+#! /usr/bin/env python
+import os
+#for a in os.environ.keys():
+env = os.environ.keys()
+	print env
+::::::../evilpass.py
+#!/usr/bin/env python2
+#
+# A simple password generator
+
+#
+import random
+import string
+
+# make a list of characters minus the last 5 (tabs etc...)
+list = string.printable[:-5]
+
+# Select 8 characters
+for i in range(8):
+	print list[random.randrange(len(list))],
+
+::::::../findhash.py
+import sys
+for line in sys.stdin.readlines():
+	if line[0] == '#':
+		print line,
+::::::../findtabs.py
+#!/usr/bin/env python2
+# find files, search for tabs
+
+import string,os
+
+cmd = 'find . -name "*.py" -print'
+
+for file in os.popen(cmd).readlines(): #run the find command
+	num = 1
+	name = file[:-1] # strip off '\n'
+	for line in open(name).readlines():	#scan the file'
+		pos = string.find(line, '\t')
+		if pos >= 0:
+			print name, num, pos #report tab found
+			print '....', line[:-1] # [:-1] strips final "\n"
+			print '....', ''*pos + '*', '\n'
+
+		num = num+1
+::::::../gvr02.py
+import re, os, sys, time
+
+pat = r"""(?x)                          # enable long format
+        (\S+\s+\S+\s+\d+\s+\d+:\d+:\d+\s+\d+)\s+ # date
+        (\d+)\s+                        # number
+        (\S+)\s+                        # host
+        (\d+)\s+                        # bytes
+        (\S+)\s+                        # file
+        """
+
+def report(n, t0, nh):
+    print "%7d good lines in %.3f seconds" % (n, time.clock() - t0),
+    print "(%d unique hosts)" % nh
+
+def main():
+    t0 = time.clock()
+    prog = re.compile(pat)
+    if sys.argv[1:]:
+        file = sys.argv[1]
+    else:
+        file = "xferlog-2001-02"
+    f = open(file)
+    n = 0
+    table = {}
+    hosts = {}
+    for line in f.xreadlines():
+        m = prog.match(line)
+        if not m:
+            print "bad line", `line`
+        else:
+            n = n+1
+            url = m.group(5)
+            table[url] = table.get(url, 0) + 1
+            host = m.group(3)
+            hosts[host] = hosts.get(host, 0) + 1
+            if n%50000 == 0:
+                report(n, t0, len(hosts))
+    report(n, t0, len(hosts))
+    list = [(count, url) for url, count in table.items()]
+    list.sort()
+    list.reverse()
+    for count, url in list[:100]:
+        print "%7d %s" % (count, url)
+
+main() ::::::../interest.py
+#!/usr/bin/python
+
+import sys
+
+print "Time to calculate some interest... ok."
+
+print "What is the APR (as a percentage)? ",
+apr = float(sys.stdin.readline()) / 100.0
+mpr = apr / 12
+
+print "\nWhat is your monthly payment? ",
+payment = float(sys.stdin.readline())
+
+print "\nWhat is your beginning balance? ",
+balance = float(sys.stdin.readline())
+
+print "-" * 50
+print "SCHEDULE..."
+print "-" * 50
+
+i = 1
+begin_balance = balance
+end_balance = balance
+total_interest = 0.0
+total_paid = 0.0
+
+while end_balance > 0.0:
+    print "MONTH", `i`
+
+    interest = mpr * begin_balance
+    # Don't overpay.
+    if payment <= begin_balance + interest:
+        real_payment = payment
+    else: real_payment = begin_balance + interest
+    
+    end_balance = begin_balance + interest - real_payment
+
+    print "\tending balance:"
+    print "\t %f + %f - %f = %f" % \
+          (begin_balance, interest, real_payment, end_balance)
+    ## set up next month.
+    i = i + 1
+    begin_balance = end_balance
+    
+    ## count totals.
+    total_paid = total_paid + real_payment
+    total_interest = total_interest + interest
+
+print "TOTAL PAID: %f\tTOTAL INTEREST PAID: %f" % (total_paid, total_interest)
+
+
+::::::../mydir.py
+# A module that lists the namespaces of other modules
+
+verbose = 1
+
+def listing(module):
+	if verbose:
+        	print "-"*30	# print 30 of these	
+		print "name:", module.__name__, "file:", module.__file__
+		print "-"*30
+
+	count = 0
+	for attr in module.__dict__.keys():	#scan namespace
+		print "%02d) %s" % (count,attr),
+		if attr[0:2] == "__":
+			print "<builtin name>"	
+		else:
+			print getattr(module,attr)
+		count = count+1
+
+	if verbose:
+		print "-"*30
+		print module.__name__, "has %d names" % count
+		print "-"*30
+
+if __name__ == "__main__":
+	import mydir
+	listing(mydir)	# self test code: list myself
+
+::::::../myModule2.py
+print 'starting to load...'
+
+import sys
+name = 42
+
+def func(): pass
+
+class Klass: pass
+
+print 'done loading.'
+
+::::::../nicepass.py
+#!/usr/bin/env python2
+#
+# Make a semi readable password from the /usr/share/dict/linux.words file
+# 
+import random
+import string
+
+# Ask user how many passwords
+print 'How many do you want? :'
+num = raw_input()
+num = string.atoi(num)
+
+words = open('/usr/share/dict/linux.words')
+
+# Make a list
+biglist = words.readlines()
+ 
+words.close()
+
+# make two more lists start with empty lists
+firstthree = []
+lastthree = []
+
+for word in biglist:
+	firstthree.append(word[:3])
+	lastthree.append(word[-4:-1])
+
+# Now print some
+for p in range(num):
+	print "%s%s%d" % (lastthree[random.randrange(len(lastthree))] , firstthree[random.randrange(len(firstthree))] , random.randrange(10) )
+::::::../parse.py
+#!/usr/bin/env python2
+
+import sys, string
+
+for line in sys.stdin.readlines():
+    print line[:-1]
+    if line[0] == "#":		    #if it's a '#' skip it
+	pass
+    else:
+	print line[0]
+	
+    #entry = string.split(line)
+    #print "/usr/sbin/useradd -d /export/home/%s -c \"%s %s\" %s" % (entry[2],entry[0],entry[1],entry[2])
+::::::../pathinfo.py
+"""pathinfo.py:  Object for manipulating information about pathnames
+    and their related i-nodes.
+
+    Written by John W. Shipman (john@nmt.edu), New Mexico Tech
+    Computer Center, Socorro, NM 87801, in March 1997.
+
+    Freely available under the terms of the GNU General Public
+    License.
+
+    This class defines methods for the ten standard components
+    of the os.stat() value, giving information about file status.
+
+    Exported methods:
+================================================================
+    PathInfo(pathName)
+        [ if pathname is a valid, existing path name ->
+            return a PathInfo representing that path and the
+                associated i-node
+          else ->
+            raise an exception
+        ]
+    .__str__()
+        [ return a string of the form "m  t  p" where:
+            m  :=  "drwxrwxrwx" part of `ls -l'
+            t  :=  time as "yyyy-mm-dd hh:mm:ss"
+            p  :=  pathname used to create self
+        ]
+    .size()
+        [ return self's size as an integer
+        ]
+    .ownerCanRead()
+        [ if owner can read self -> return a nonzero integer
+          else -> return 0
+        ]
+    .ownerCanWrite()
+        [ if owner can write self -> return a nonzero integer
+          else -> return 0
+        ]
+    .ownerCanExec()
+        [ if owner can execute self -> return a nonzero integer
+          else -> return 0
+        ]
+    .groupCanRead()
+        [ if group can read self -> return a nonzero integer
+          else -> return 0
+        ]
+    .groupCanWrite()
+        [ if group can write self -> return a nonzero integer
+          else -> return 0
+        ]
+    .groupCanExec()
+        [ if group can execute self -> return a nonzero integer
+          else -> return 0
+        ]
+    .worldCanRead()
+        [ if world can read self -> return a nonzero integer
+          else -> return 0
+        ]
+    .worldCanWrite()
+        [ if world can write self -> return a nonzero integer
+          else -> return 0
+        ]
+    .worldCanExec()
+        [ if world can execute self -> return a nonzero integer
+          else -> return 0
+        ]
+    .isDir()
+        [ if self is a directory -> return a nonzero integer
+          else -> return 0
+        ]
+    .isLink()
+        [ if self is a symbolic link -> return a nonzero integer
+          else -> return 0
+        ]
+    .isFile()
+        [ if self is an ordinary disk file -> return a nonzero integer
+          else -> return 0
+        ]
+"""
+
+import os               # Operating system functions
+import time             # Functions for handling time
+import stat             # Functions for interpreting file status tuples
+
+class PathInfo:
+    """Object to represent a pathname and the information from the
+        associated inode.
+    """
+
+#----------------------------------------------------------------
+# State
+#----------------------------------------------------------------
+# .path == The path passed to __init__
+#--
+# .stat == The file status tuple
+#--
+# .mode == The mode bits from the file status tuple
+#--
+
+    def __init__ ( self, pathName ):
+        self.path  =  pathName
+        self.stat  =  os.lstat(pathName)
+        self.mode  =  self.stat[stat.ST_MODE]
+
+    def __str__ ( self ):
+        baseName = (os.path.split(self.path))[1]
+        return ( "%s  %s  %8d %s" %
+                 ( self._modeFlags(), self._modTime(), self.size(),
+                   baseName ) )
+
+    def _modeFlags ( self ):
+        return self._dirFlag() + self._permFlags()
+
+    def _dirFlag ( self ): 
+        """ [ if self is a directory -> return "d"
+              else if self is a symbolic link -> return "l"
+              else if self is a regular file -> return "-"
+              else -> return "?"
+            ]
+        """
+        if stat.S_ISLNK(self.mode):
+            return "l"
+        elif stat.S_ISDIR(self.mode):
+            return "d"
+        elif stat.S_ISREG(self.mode):
+            return "-"
+        else:
+            return "?"
+
+    def _permFlags ( self ):
+        """Return the `rwxrwxrwx' part of ls output
+        """
+        return ( self._rwx ( self.mode & stat.S_IRUSR,
+                             self.mode & stat.S_IWUSR,
+                             self.mode & stat.S_IXUSR ) +
+                 self._rwx ( self.mode & stat.S_IRGRP,
+                             self.mode & stat.S_IWGRP,
+                             self.mode & stat.S_IXGRP ) +
+                 self._rwx ( self.mode & stat.S_IROTH,
+                             self.mode & stat.S_IWOTH,
+                             self.mode & stat.S_IXOTH ) )
+
+    def _rwx ( self, r, w, x ):
+        """ [ return a string of the form "abc" where:
+                a  :=  "r" if r is nonzero, else "-"
+                b  :=  "w" if w is nonzero, else "-"
+                c  :=  "x" if x is nonzero, else "-"
+            ]
+        """
+        return ( self._dasher ( r, "r" ) +
+                 self._dasher ( w, "w" ) +
+                 self._dasher ( x, "x" ) )
+
+    def _dasher ( self, b, c ):
+        """ [ if b is true -> return c
+              else -> return "-"
+            ]
+        """
+        if b:
+            return c
+        else:
+            return "-"
+
+    def _modTime ( self ):
+        """ [ return self's modification time as "yyyy-dd-mm hh:mm:ss"
+            ]
+        """
+        return time.strftime ( "%Y-%m-%d %H:%M:%S",
+                               time.localtime ( self.stat[stat.ST_MTIME] ) )
+
+    def size ( self ):
+        return self.stat[stat.ST_SIZE]
+
+    def ownerCanRead ( self ):
+        return self.mode & stat.S_IRUSR
+
+    def ownerCanWrite ( self ):
+        return self.mode & stat.S_IWUSR
+
+    def ownerCanExec ( self ):
+        return self.mode & stat.S_IXUSR
+
+    def groupCanRead ( self ):
+        return self.mode & stat.S_IRGRP
+
+    def groupCanWrite ( self ):
+        return self.mode & stat.S_IWGRP
+
+    def groupCanExec ( self ):
+        return self.mode & stat.S_IXGRP
+
+    def worldCanRead ( self ):
+        return self.mode & stat.S_IROTH
+
+    def worldCanWrite ( self ):
+        return self.mode & stat.S_IWOTH
+
+    def worldCanExec ( self ):
+        return self.mode & stat.S_IXOTH
+
+    def isDir ( self ):
+        return stat.S_ISDIR ( self.mode )
+
+    def isLink ( self ):
+        return stat.S_ISLNK ( self.mode )
+
+    def isFile ( self ):
+        return stat.S_ISREG ( self.mode )
+::::::../PenguinPen.py
+
+class PenguinPen:
+	def __init__(self):
+		self.penguinCount = 0
+
+	def add (self, number = 1):
+		""" Add one or more penguins to the pen
+		The default number of penguins to add is 1 """
+		self.penguinCount = self.penguinCount + number
+
+	def remove (self, number = 1):
+		""" Remove one or more  penguins from the pen """
+		self.penguinCount = self.penguinCount - number
+
+	def population (self):
+		""" How many penguins in the pen? """
+		return self.penguinCount
+::::::../penpen.py
+#!/usr/bin/env python
+
+from PenguinPen import *
+
+myPen = PenguinPen()    # call the class as a function to make an instance
+print 'There are ' + `myPen.population()` + ' pigs '
+print 'Add one...'
+myPen.add()             # default, add one penguin
+print 'Now there is ' + `myPen.population()` + ' pig'  # will print 1
+print 'Lets add another...'
+myPen.add()
+print 'Now there are ' + `myPen.population()` + ' pigs'
+
+::::::../pigfiles.py
+#!/usr/bin/env python
+#--
+# pigfiles.py:  A script to list all the files in a directory tree
+#   in descending order by file size, with full pathname.
+#--
+
+import sys
+import os
+import pathinfo
+
+class Pig(pathinfo.PathInfo):
+	"""Container for a PathInfo object, and a path
+	"""
+	def __cmp__ ( self, other ):
+		compare  =  - cmp ( self.size(), other.size() )
+		if compare != 0:
+			return compare
+		else:
+			return cmp ( self.path, other.path )
+
+	def __str__ ( self ):
+		return "%s %10s %s" % ( self._modTime(), self.size(), self.path )
+
+#--
+# Procedures for pigfiles.py
+#--
+
+#- - -   V i s i t o r   - - -
+
+def Visitor ( arg, dirName, nameList ):
+	info = Pig ( dirName )
+	files.append ( info )	# Append directory entry
+#--
+# Append entries for all included names that are not themselves
+# directories
+#--
+	for fileName in nameList:
+		info = Pig ( os.path.join ( dirName, fileName ) )
+		if info.isFile():
+			files.append ( info )
+
+
+# - - -   p i g f i l e s . p y   - -   m a i n   - - -
+
+files = []		# List of Pig objects, one per dir. or file
+
+try:
+	root = sys.argv[1]	# First command line argument = directory name
+except:
+	root = "."			# Default is current directory
+
+#--
+# Build a list of Pig objects for all directories and files
+#--
+
+os.path.walk ( root, Visitor, None )
+
+files.sort()		# Sort using builtin cmp() method
+
+for pig in files:
+	print pig
+::::::../pigpen.py
+#!/usr/bin/env python
+
+from PenguinPen import *
+
+myPen = PenguinPen()    # call the class as a function to make an instance
+print 'There are ' + `myPen.population()` + ' pigs '
+print 'Add one...'
+myPen.add()             # default, add one penguin
+print 'Now there is ' + `myPen.population()` + ' pig'  # will print 1
+print 'Lets add another...'
+myPen.add()
+print 'Now there are ' + `myPen.population()` + ' pigs'
+print "Kicking one out..."
+myPen.remove()
+print "Now there are %d pigs" % myPen.population()
+::::::../pingthing.py
+#!/usr/bin/env python2
+#
+# 
+import os
+
+def checker(cmd, host):
+	print 'Doing %s to %s' % (cmd,host)
+	res = os.system('%s %s' % (cmd , host))
+	return res
+
+ping='ping  -c 2 -q'
+hosts = ['cyndra','supermax','a-ko','sashimi']
+
+for host in hosts:
+
+	checker(ping, host)
+
+::::::../PythonUnit.py
+#!/usr/bin/env python
+
+import sys                      # python system modules 
+
+from testCase import TestCase   # note file name, class name
+from PenguinPen import PenguinPen
+
+class testPenguinPen(TestCase):
+	def __init__(self, name):
+		self.name = name
+
+	def setUp(self):
+		"""Create a new Penguin Pen"""
+		myPen = PenguinPen()
+
+	def tearDown(self):
+		"""Delete the Penguin Pen"""
+		myPen = None				
+	def testNewPen(self):
+		"""A new pen should be empty"""
+		should(myPen.population == 0)
+	def testAdd(self):
+		"""Adding without saying how many will only add one"""
+		should(myPen.add() == 1)
+	def testRemove(self):
+		"""Removing without saying how many will only remove one"""
+		should(myPen.remove() == -1)
+
+if __name__ == '__main__':
+	stuff = testPenguinPen('unit test')
+	stuff.setUp
+	stuff.testNewPen
+	stuff.tearDown
+	stuff.setUp
+	stuff.testAdd
+	stuff.tearDown
+	stuff.setUp
+	stuff.testRemove
+	stuff.tearDown
+	print "No news is good news"
+
+::::::../randomname.py
+#This module is the result of my early efforts to learn Python.  Basically I thought
+#that Python would be well suited to a task that had defeated me previously in my
+#attempts to do it in other languages, which was to write a random-name generator.
+#(The sort of thing that might come in handy if you play roguelike games).
+#I found it so easy that I decided to write a whole bunch of 'extras' to accompany the
+#original function (now called namer3s).  Here they all are.
+
+#namer3s generates a long-ish name.
+def namer3s():
+    Inconst = ['W', 'R', 'T', 'W', 'W', 'W', 'W', 'W', 'W', 'U', 'P', 'S', 'D', 'F', 'G', 'H', 'J']
+    Insyllb = ['art', 'av', 'eun', 'em', 'ill', 'it', 'ol', 'ower', 'ull', 'ulc']
+    Ensyllb = ['ax', 'ea', 'ia', 'on', 'ur']
+    import random
+    First = random.choice(Inconst)
+    Second = random.choice(Insyllb)
+    Third = random.choice(Ensyllb)
+    gummy = "%s%s%s" % (First, Second, Third)
+    return gummy
+
+#namer2s generates a short name.  In its current form it has a very limited range of
+#syllables to choose from, but that's easily remedied.
+def namer2s():
+    Inconst = ['W', 'R', 'T', 'W', 'B', 'W', 'W', 'G', 'H', 'U', 'P', 'S', 'D', 'F', 'G', 'H', 'J']
+    Ensyllb = ['ald', 'eve', 'iotr', 'olov', 'ume', 'ull', 'ara']
+    import random
+    First = random.choice(Inconst)
+    Second = random.choice(Ensyllb)
+    gummy = "%s%s" % (First, Second)
+    return gummy
+
+#lnamer generates a short name followed by a longer name.  It merely calls the two functions
+#above in succession and whacks them into a string.
+def lnamer():
+    gummy = "%s %s" % (namer2s(), namer3s())
+    return gummy
+
+#rnamer randomly chooses to run either namer2s, namer3s, or lnamer. Wow.
+def rnamer():
+    coinflip = [1, 2, 3]
+    import random
+    side = random.choice(coinflip)
+    if side == 1:
+        gummy = namer3s()
+    elif side == 2:
+        gummy = namer2s()
+    else:
+        gummy = lnamer()
+    return gummy
+
+#xnamer takes a different approach altogether.  It only has one list of components,
+#from which it takes from 1-7 items and knocks them together.  In some ways more
+#interesting names are produced, but unpronouncables are far more common also.
+def xnamer():
+    import random, string
+    letters = ['w', 'r', 't', 'b', 'x', 'a', 'd', 'e', 'm', 'u', 'k', 's', 'd', 'f', 'g', 'h', 'j',
+               'art', 'av', 'eun', 'em', 'ill', 'it', 'ol', 'ower', 'ull', 'ulc',
+               'ax', 'ea', 'ia', 'on', 'ur', 'ald', 'eve', 'iotr', 'olov', 'ume', 'mm',
+               'ge', 'gu', 'ma', 'y', 'to', 'even', 'st', 'anforth', 'th', 'th', 'p',
+               'qu', 'oi', 'ja', 'lle', 'z', 'v', 'c', 'b', 'mn', 'nm', 'y', 'ir',
+               'an', 'da', 'is', 'ge', 'or', 'gi', 'a', 'al', 'ter', 'lly', 'oto']
+    parts = [1, 2, 3, 4, 5, 6, 7]
+    numparts = random.choice(parts)
+    repeater = range(numparts)
+    gummy = ""
+    for item in repeater:
+        gummy = gummy + random.choice(letters)
+    gummy = string.capitalize(gummy)
+    return gummy
+
+#lengthnamer generates xnamer names until it gets one of the desired length.
+#note that asking for a long name (more than about 15 characters) will cause
+#an indefinitely long loop.  Avoid, dude.  Also note that it is the only one of
+#these functions that actually takes an argument.
+def lengthnamer(namelength):
+    gummy = ""
+    while len(gummy) != namelength:
+        gummy = xnamer()
+    return gummy
+
+#getter gets you a name of a specific length with a specific initial
+def getter(initial, length):
+    import string
+    gummy = "@"
+    initial = string.capitalize(initial)
+    begin = "%c" % (initial)
+    while gummy[0] != begin:
+        gummy = lengthnamer(length)
+    return gummy
+::::::../range.py
+#!/usr/bin/env python
+
+"""
+A nifty command line utility. What to do, on a Unix command line, if you
+have files named file001 through file050, and you have to move the odd ones
+to the directory Spam?
+
+for i in `range 1 51 2 file%03d`; do mv $i Spam; done
+
+This tiny thing makes range available for the command line, together with
+a formatting string because I found that that was useful.
+"""
+
+import sys
+import string
+
+if len(sys.argv) < 3:
+    print "Usage: range <from> <to> [<step>] [<format>]"
+
+a = int(sys.argv[1])
+b = int(sys.argv[2])
+step = 1
+format = "%d"
+
+if len(sys.argv) >= 4:
+    try:
+	step = int(sys.argv[3])
+    except:
+	format = sys.argv[3]
+if len(sys.argv) >= 5:
+    format = sys.argv[4]
+
+for l in range(a,b,step):
+    print format % l
+
+::::::../shakeinsult.py
+#!/usr/bin/env python
+#script for writing a shakespearean insult to the .signature file. special thanks
+#to Chris Seidel for making the Shakespearean Insult page.
+#I originally wrote this in perl and the script is entirely unreadable to me now.
+#My server just got completely rebuilt and now all of the perl libraries are missing;
+#so, insead of hunting them down, I decided to rewrite the thing in python.
+#I am sure this can be improved upon, if you have any comments please feel free to
+#email me at kauphlyn@speakeasy.org. 
+ 
+import urllib
+import re
+def getinsult():
+#get the html file and write it to .tpm.txt
+	urllib.urlretrieve('http://www.pangloss.com/seidel/Shaker/index.html', '.tmp.txt')
+# open .tmp.txt for reading
+	f = open('.tmp.txt')
+# open .signature for writing
+	sig = open('.signature', 'w')
+#read from .tmp.txt
+	a = f.read()
+# close the .tmp.txt file
+	f.close()
+# Remove html code
+	a = re.sub('<([a-z]|[A-Z])+>|</([a-z]|[A-Z])+>','',a)
+	a = re.sub('(<.+>)','',a)
+	a = re.sub('\\n','',a)
+	a = re.sub('Shakespearean Insulter','',a)
+
+	if re.search('Taken from:', a):
+		list2 = re.split('Taken from:', a)
+		list3 = re.split('Adapted', list2[1])
+		sig.write('--------------------------------------------\n')
+		sig.write(list2[0]+'\n-William Shakespeare,'+ list3[0])
+		sig.close()
+	else:
+		getinsult()
+
+getinsult()
+
+::::::../simple.py
+print 'hello'
+spam = 1
+::::::../thumbnail.py
+#!/usr/bin/python
+
+import os, sys
+import Image
+
+def createThumb(infile, maxwidth, maxheight):
+    outfile = os.path.splitext(infile)[0] + ".thumb"
+    if infile != outfile:
+        try:
+            im = Image.open(infile)
+            im.thumbnail((maxwidth,maxheight))
+            im.save(outfile, "JPEG")
+            return outfile
+            
+        except IOError:
+            pass
+
+    return ""
+
+def thumbDir (path, maxwidth, maxheight):
+    dirlist = os.listdir(path)
+    dirlist.sort()
+    piclist = []
+
+    for i in range(len(dirlist)):
+        foo = path + "/" + dirlist[i]
+        ##print foo
+        if os.path.isfile(foo):
+            tname = createThumb(foo,maxwidth,maxheight)
+            ##print "tname:",tname
+            if tname != "":
+                piclist.append((foo, tname))
+
+    return piclist
+
+def thumbHtml(piclist, rowsize):
+    outfile = os.path.dirname(piclist[0][0]) + "/index.html"
+    # print outfile
+
+    f = open(outfile,'w')
+    f.write('<html><body>\n')
+    
+    f.write('<table>\n')
+    colcount = 0
+    for i in range(len(piclist)):
+        if colcount == 0:
+            f.write('  <tr>\n')
+        
+        big = os.path.basename(piclist[i][0])
+        little = os.path.basename(piclist[i][1])
+        # print big, little
+        f.write(' <td><table>\n')
+        f.write('     <tr><td align=center valign=bottom><a href=' + big + '><img src=' + little + '></td></tr>\n')
+        f.write('     <tr><td>' + big + '</td></tr>\n')
+        f.write(' </table></td>\n')
+        colcount = colcount + 1
+        if colcount == rowsize:
+            colcount = 0
+            f.write('  </tr>\n')
+    f.write('</table>\n')
+    f.write('</body></html>\n')
+    f.close()
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        thumbHtml(thumbDir(sys.argv[1],64,64),8)
+    
+::::::../timer.py
+# timer.py v 1.1
+# Original program written by Timothy M. Brauch <tbrauch@mindless.com>
+# Written November 20, 2000
+# First Beta version finished December 3, 2000
+# Version 1.0 completed December 6, 2000
+# Version 1.1 completed February 22, 2001
+# Version 1.1 adds a visual display of countdown.
+
+from visual import cone, cylinder, curve, display, sphere, label
+import time
+
+scene=display(title='Hourlgass', background=(0,0,.5))
+
+class Hourglass:
+
+    # This program will generate a visual hourglass useful
+    # for timing simple things.
+
+    def __init__(self,timer_length,markings=0):
+        self.start_time=time.time()
+        self.time=timer_length
+
+        # if markings is enabled calibration labels will be displayed
+
+        if markings !=0:
+            self.marks()
+
+        self.sand()
+        self.frame(1)
+        self.frame(-1)
+        self.phase_1()
+        self.phase_2()
+        self.phase_3()
+        self.end_time=time.time()
+
+    def sand(self):
+        self.top=cone(pos=(0,self.time*1.1,0),
+                      axis=(0,-1,0),
+                      color=(1,1,0))
+        self.bottom=cone(pos=(0,-self.time*1.1,0),
+                         axis=(0,1,0),
+                         color=(.5,.5,0))
+        self.falling=cylinder(pos=(0,self.time*0.125,0),
+                              axis=(0,-1,0),
+                              color=(.5,.5,0),
+                              radius=self.time*0.035)
+        self.countdown=sphere(pos=(0,self.time*1.5,0),
+                              radius=0)
+
+    def frame(self,sign):
+        self.glass=curve(pos=[(sign*self.time,-self.time*1.1,0),
+                              (sign*self.time*0.05,-self.time*0.1,0),
+                              (sign*self.time*0.05,self.time*0.1,0),
+                              (sign*self.time,self.time*1.1,0),
+                              (sign*self.time,self.time*1.15,0)],
+                         radius=self.time*.025)
+        self.base=cylinder(pos=(0,sign*self.time*1.15,0),
+                           axis=(0,1,0),
+                           length=self.time*0.1,
+                           radius=self.time*1.2,
+                           color=(.66,.46,.13))
+        self.pole=cylinder(pos=(sign*self.time,-self.time*1.1,0),
+                           axis=(0,1,0),
+                           length=self.time*2.3,
+                           radius=self.time*0.06,
+                           color=(.66,.46,.13))
+
+    def phase_1(self):
+        while (time.time()-self.start_time<self.time*.1):
+            self.falling.length=time.time()*11.5-self.start_time*11.5
+            self.top.radius=self.time-(time.time()-self.start_time)
+            self.top.length=self.top.radius
+            self.top.pos=(0,self.top.length+1,0)
+            self.countdown.label=(str(self.start_time+self.time-time.time())+' seconds left')
+
+    def phase_2(self):
+        while (time.time()-self.start_time<=self.time*.9):
+            self.top.radius=self.time-(time.time()-self.start_time)
+            self.top.length=self.top.radius
+            self.top.pos=(0,self.top.length+1,0)
+            self.bottom.radius=time.time()-self.start_time
+            self.bottom.length=self.bottom.radius
+            self.countdown.label=(str(self.start_time+self.time-time.time())+' seconds left')
+        self.top.visible=0
+
+    def phase_3(self):
+        while (time.time()-self.start_time<=self.time):
+            self.falling.pos=(0,-self.time*1.1,0)
+            self.falling.axis=(0,1,0)
+            self.falling.length=((self.time-time.time()+self.start_time)*12.5)
+            self.countdown.label=(str(self.start_time+self.time-time.time())+' seconds left')
+        self.falling.visible=0
+        self.countdown.visible=0
+        end=label(pos=(0,self.time*1.5,0),
+                  text='End')
+
+    def marks(self):
+        marks_list=[]
+        new_time=self.time
+        while (new_time>=5):
+            marks_list.append(int(new_time))
+            new_time=new_time-5.0
+        marks_list.append(int(0))
+        for marks in marks_list:
+            sphere(pos=(marks,marks*1.1,0),
+                   radius=0,
+                   label=str(marks)+' seconds')
+
+Hourglass(15,1) ::::::../userpass2001.py
+# This is a really basic User Login Interface that may be slapped into another
+# script that fuctions differently for different users. Security and other features 
+# could be plugged in.
+# 
+# Rob Andrews
+# rob@jam.rr.com
+
+# Dictionary of UserIDs and their Passwords
+pwds = {"guest":"anonymous", "rob":"deadparrot", "root":"spam"}
+# Maximum number of login attempts set.
+# maxlogin = input("Please specify the maximum number of allowed logins for this session. ")
+maxlogin = 3
+# UserId and Password are requested from the user a maximum number of times.
+loginattempts = 0
+while loginattempts < maxlogin:
+	loginattempts = loginattempts + 1
+	userid = raw_input("Please enter your UserID: ")
+	password = raw_input("Please enter your Password: ")
+	# If the UserID supplied by the user appears in the pwds dictionary,
+	# test to see if the corresponding password is correct.
+	if pwds.has_key(userid):
+		if password == pwds[userid]:
+			print "Consider yourself logged in!"
+			break
+		else:
+			print "Your pathetic login attempt has failed!"
+	else:
+		print "You appear to be ontologically challenged."
+raw_input("Press [Enter] to end this session.\nIf you do not have a UserID,\ntry 'guest' with a Password of 'anonymous' next time. >")
+::::::../user.py
+#! /usr/bin/env python
+import os
+if os.environ['USER']:
+	print 'Hello, '+os.environ['USER']

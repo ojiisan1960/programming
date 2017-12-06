@@ -1,0 +1,6 @@
+#!/bin/awk -f
+
+#myawk14
+# print the number of computers
+
+        END     { print "There are ", NR, "computers" }

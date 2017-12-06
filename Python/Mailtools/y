@@ -1,0 +1,155 @@
+--------------------------------------------------------------------------------
+message deferral detail
+--------------------------------------------------------------------------------
+        54   server dropped connection
+--------------------------------------------------------------------------------
+        13   server refused mail service
+         7   helix.cs.yale.edu[128.36.229.95]: No route to host
+         4   4.4.5 <joan.feigenbaum@yale.edu>... Insufficient disk spac...
+--------------------------------------------------------------------------------
+         2   serv09.segi.ulg.ac.be[139.165.32.78]: read timeout
+--------------------------------------------------------------------------------
+         2   mail04.eserve02.com[65.240.227.53]: read timeout
+--------------------------------------------------------------------------------
+         2   edq.com[65.216.121.97]: server dropped connection
+--------------------------------------------------------------------------------
+         2   mail07.eserve02.com[65.240.227.56]: read timeout
+--------------------------------------------------------------------------------
+         2   mx.mail.hongkong.com[202.84.15.133]: read timeout
+--------------------------------------------------------------------------------
+         2   serv08.segi.ulg.ac.be[139.165.32.77]: read timeout
+--------------------------------------------------------------------------------
+         1   mailrecv.bigmailbox.com[209.132.220.133]: read timeout
+--------------------------------------------------------------------------------
+message bounce detail (by relay)
+         4   unknown user: "ceres.cs.yale.edu"
+         4   mail forwarding loop for gelernter-david@cs.yale.edu
+         2   unknown user: "phoebus.cs.yale.edu"
+         2   unknown user: "phoebus.cs.yale.ed"
+         2   unknown user: "nereid.cs.yale.edu"
+         2   unknown user: "25ceres.cs.yale.edu"
+         1   unknown user: "dturner.ganymede.cs.yale.edu"
+         1   unknown user: "25phoebus.cs.yale.edu"
+         1   mail forwarding loop for cs112@cs.yale.edu
+         1   unknown user: "ganymede.cs.yale.edu"
+        59   mail for eli.cs.yale.edu loops back to myself
+        11   mail for cyndra.cs.yale.edu loops back to myself
+         5   Name service error for thornbush.med.yale.edu: Host not found
+         4   mail for ragged.cs.yale.edu loops back to myself
+         4   mail for ohia.cs.yale.edu loops back to myself
+         3   mail for lambda.cs.yale.edu loops back to myself
+         2   mail for opus.cs.yale.edu loops back to myself
+         2   Name service error for pantheon.cs.yale.edu: Host not found
+         2   Name service error for james.cs.yale.edu: Host not found
+         1   mail for helga.cs.yale.edu loops back to myself
+         1   mail for arlo.cs.yale.edu loops back to myself
+         1   Name service error for nebula.cs.yale.edu: Host not found
+         1   mail for jade.cs.yale.edu loops back to myself
+         1   mail for microwave.cs.yale.edu loops back to myself
+         1   5.1.1 <ceres.cs.yale.edu@kiev.ua>... User unknown
+         6   <leonid.turetsky.br.97@aya.yale.edu>... User Unknown
+  pantheon-po01.its.yale.edu[130.132.50.18]
+         4   5.1.1 <lucyc@minerva.its.yale.edu>... User unknown
+         4   5.1.1 <mattr@minerva.its.yale.edu>... User unknown
+         4   5.1.1 <xuq@minerva.its.yale.edu>... User unknown
+         2   5.1.1 <dawn@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <schuler@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <bmooney@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <sethg@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <korins@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <rsingh@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <mckaypj@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <udo@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <warren@minerva.its.yale.edu>... User unknown
+  pantheon-po02.its.yale.edu[130.132.50.17]
+         5   5.1.1 <mattr@minerva.its.yale.edu>... User unknown
+         5   5.1.1 <lucyc@minerva.its.yale.edu>... User unknown
+         3   5.1.1 <xuq@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <korins@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <davecam@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <wendyr@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <rsingh@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <bird@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <juneja@minerva.its.yale.edu>... User unknown
+  pantheon-po03.its.yale.edu[130.132.50.19]
+         5   5.1.1 <lucyc@minerva.its.yale.edu>... User unknown
+         3   5.1.1 <korins@minerva.its.yale.edu>... User unknown
+         3   5.1.1 <xuq@minerva.its.yale.edu>... User unknown
+         2   5.1.1 <mattr@minerva.its.yale.edu>... User unknown
+         2   5.1.1 <wesley@minerva.its.yale.edu>... User unknown
+         2   5.1.1 <grizzly@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <heathers@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <zinaida@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <bird@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <katym@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <jonand@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <celia@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <kebide@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <wendyr@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <bmooney@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <carlj@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <warren@minerva.its.yale.edu>... User unknown
+  pantheon-po04.its.yale.edu[130.132.50.23]
+         4   5.1.1 <lucyc@minerva.its.yale.edu>... User unknown
+         3   5.1.1 <mattr@minerva.its.yale.edu>... User unknown
+         3   5.1.1 <xuq@minerva.its.yale.edu>... User unknown
+         2   5.1.1 <bird@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <joshuak@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <kennar@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <dawn@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <grizzly@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <romero@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <davecam@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <wesley@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <cherlana@minerva.its.yale.edu>... User unknown
+         1   5.1.1 <warren@minerva.its.yale.edu>... User unknown
+--------------------------------------------------------------------------------
+message reject detail
+--------------------------------------------------------------------------------
+    Recipient address rejected: Relay access denied
+           2   mailrelay%ort-r01.mx.aol.com@netra.cs.yale.edu
+           2   relaytest%rr.njabl.org@netra.cs.yale.edu
+          45   25ceres.cs.yale.edu@co.uk
+--------------------------------------------------------------------------------
+smtp delivery failures
+--------------------------------------------------------------------------------
+  connection refused
+         1   mr3.its.yale.edu
+--------------------------------------------------------------------------------
+  connection timed out
+         2   hepmail1.physics.yale.edu
+--------------------------------------------------------------------------------
+  network is unreachable
+--------------------------------------------------------------------------------
+  no route to host
+         7   helix.cs.yale.edu
+--------------------------------------------------------------------------------
+  read timeout
+--------------------------------------------------------------------------------
+  server dropped connection
+--------------------------------------------------------------------------------
+  server refused mail service
+--------------------------------------------------------------------------------
+Warnings
+--------------------------------------------------------------------------------
+  postsuper
+--------------------------------------------------------------------------------
+  qmgr
+--------------------------------------------------------------------------------
+         1   qmgr_active_corrupt: save corrupt file queue active id C8F10D74...
+        59   mailer loop: best MX host for eli.cs.yale.edu is local
+        11   mailer loop: best MX host for cyndra.cs.yale.edu is local
+         4   mailer loop: best MX host for ohia.cs.yale.edu is local
+         4   mailer loop: best MX host for ragged.cs.yale.edu is local
+         3   mailer loop: best MX host for lambda.cs.yale.edu is local
+         2   mailer loop: best MX host for opus.cs.yale.edu is local
+         1   mailer loop: best MX host for microwave.cs.yale.edu is local
+         1   mailer loop: best MX host for jade.cs.yale.edu is local
+         1   mailer loop: best MX host for helga.cs.yale.edu is local
+         1   mailer loop: best MX host for arlo.cs.yale.edu is local
+--------------------------------------------------------------------------------
+Fatal Errors: none
+--------------------------------------------------------------------------------
+Panics: none
+--------------------------------------------------------------------------------
+Master daemon messages

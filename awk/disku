@@ -1,0 +1,3 @@
+#!/bin/awk -f
+
+{ tot +=$3 } END { print tot }

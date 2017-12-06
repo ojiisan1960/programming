@@ -1,0 +1,3 @@
+#!/bin/awk -f
+
+$3 ~ /D/ { print "Location = ", $3, " Type = ",$1}

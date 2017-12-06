@@ -1,0 +1,71 @@
+     1                                  ;  Executable name : uppercaser2
+     2                                  ;  Version         : 1.0
+     3                                  ;  Created date    : 3/25/2009
+     4                                  ;  Last update     : 3/25/2009
+     5                                  ;  Author          : Jeff Duntemann
+     6                                  ;  Description     : A simple program in assembly for Linux,using NASM 2.05,
+     7                                  ;    demonstrating simple text file I/O (through redirection) for reading an
+     8                                  ;    input file to a buffer in blocks, forcing lowercase characters to
+     9                                  ;    uppercase, and writing the modified buffer to an output file.
+    10                                  ;
+    11                                  ;  Run it this way:
+    12                                  ;    uppercaser2 > (output file) < (input file)
+    13                                  ;
+    14                                  ;  Build using these commands:
+    15                                  ;    nasm -f elf -g -F stabs uppercaser2.asm
+    16                                  ;    ld -o uppercaser2 uppercaser2.o
+    17                                  ;
+    18                                  SECTION .bss			;section containing uninitialized data
+    19                                  	BUFFLEN equ 1024	;length of buffer
+    20 00000000 <res 00000400>          	Buff:	resb BUFFLEN	;buffer
+    21                                  
+    22                                  SECTION .data			;section for initialized data
+    23                                  
+    24                                  SECTION .text			;section for code
+    25                                  
+    26                                  global _start			;linker entry point
+    27                                  
+    28                                  _start:				;start label
+    29 00000000 90                      	nop			;keeps gdb happy
+    30                                  
+    31                                  ;Read a buffer from stdin
+    32                                  Read:
+    33 00000001 B803000000              	mov eax,3		;syscall sys_read
+    34 00000006 BB00000000              	mov ebx,0		;stdin file descriptor
+    35 0000000B B9[00000000]            	mov ecx,Buff		;address of buffer
+    36 00000010 BA00040000              	mov edx,BUFFLEN		;number of bytes to read in one pass
+    37 00000015 CD80                    	int 80h			;call sys_read to fill the buffer
+    38 00000017 89C6                    	mov esi,eax		;copy sys_read return value
+    39 00000019 83F800                  	cmp eax,0		;If eax = 0, sys_read reached EOL on file
+    40 0000001C 7433                    	je Done			;jump to Done if EOL
+    41                                  ; Set up the registers to process the buffer
+    42 0000001E 89F1                        mov ecx,esi     ;number of bytes read into ecx
+    43 00000020 BD[00000000]                mov ebp,Buff    ;address of buffer into ebp
+    44 00000025 4D                          dec ebp         ;adjust count to offset
+    45                                  
+    46                                  ;Go through the buffer and convert lower case to upper case
+    47                                  Scan:
+    48 00000026 807C0D003D                  cmp byte [ebp+ecx],61   ;compare char to 'a'
+    49 0000002B 720C                        jb Next                 ;if below 'a' not lower case jump to Next
+    50 0000002D 807C0D007A                  cmp byte [ebp+ecx],7Ah      ;compare char to 'z'
+    51 00000032 7705                        ja Next                 ;if above 'z' not lower case jump to Next
+    52                                                              ; next char should be lower case
+    53 00000034 806C0D0020                  sub byte [ebp+ecx],20h  ;convert to upper case
+    54                                  Next:
+    55 00000039 49                          dec ecx                 ;decrement counter
+    56 0000003A 75EA                        jnz Scan                ; if not 0 return to Scan more chars
+    57                                  
+    58                                  ;Write the processed buffer to stdout
+    59                                  Write:
+    60 0000003C B804000000                  mov eax,4       ;syscall sys_write
+    61 00000041 BB01000000                  mov ebx,1       ;stdout file descriptor
+    62 00000046 B9[00000000]                mov ecx,Buff    ;address of buffer
+    63 0000004B 89F2                        mov edx,esi     ;number of bytes in the buffer
+    64 0000004D CD80                        int 80h         ;call sys_write
+    65 0000004F EBB0                        jmp Read        ;jump back to read to fill the buffer
+    66                                  
+    67                                  ;File is read, program complete
+    68                                  Done:
+    69 00000051 B801000000                  mov eax,1       ;syscall sys_exit
+    70 00000056 BB00000000                  mov ebx,0       ;return code of 0
+    71 0000005B CD80                        int 80h         ;call sys_exit and exit the program

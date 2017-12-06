@@ -1,0 +1,11 @@
+#!/bin/awk -f
+#
+#myawk37
+# diskspace[] holds sum of disk space for all computers
+# computers[] holds number of computers of specified type
+
+$1 == "486"  { computers["486"]++ }
+$5 >  0  { diskspace[0] += $5 }
+END  { print "Number of 486 computers =", computers[486];
+                print "Total disk space = ",diskspace[0]
+                }

@@ -1,0 +1,59 @@
+::::::test1.py
+# A module that lists the namespaces of other modules
+
+verbose = 1
+
+def listing(module):
+	if verbose:
+        	print "-"*30	# print 30 of these	
+		print "name:", module.__name__, "file:", module.__file__
+		print "-"*30
+
+	count = 0
+	for attr in module.__dict__.keys():	#scan namespace
+		print "%02d) %s" % (count,attr),
+		if attr[0:2] == "__":
+			print "<builtin name>"	
+		else:
+			print getattr(module,attr)
+		count = count+1
+
+	if verbose:
+		print "-"*30
+		print module.__name__, "has %d names" % count
+		print "-"*30
+
+if __name__ == "__main__":
+	import mydir
+	listing(mydir)	# self test code: list myself
+
+::::::test2.py
+print 'starting to load...'
+
+import sys
+name = 42
+
+def func(): pass
+
+class Klass: pass
+
+print 'done loading.'
+
+::::::test3.py
+
+class PenguinPen:
+	def __init__(self):
+		self.penguinCount = 0
+
+	def add (self, number = 1):
+		""" Add one or more penguins to the pen
+		The default number of penguins to add is 1 """
+		self.penguinCount = self.penguinCount + number
+
+	def remove (self, number = 1):
+		""" Remove one or more  penguins from the pen """
+		self.penguinCount = self.penguinCount - number
+
+	def population (self):
+		""" How many penguins in the pen? """
+		return self.penguinCount

@@ -1,0 +1,3 @@
+To compile
+
+gfortran program.f95 -o program

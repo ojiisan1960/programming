@@ -1,0 +1,8 @@
+My First Circuit
+* 10 volt voltage source
+v 1 0 10 
+* 5 ohm resistor
+r 1 0 5
+
+.print dc v(1) i(v)
+.end
