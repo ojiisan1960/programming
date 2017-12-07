@@ -13,7 +13,7 @@ int main()
 
     /* Prompt for a string */
 
-    printf("Enter a string you eediot: ");
+    printf("Enter a string of characters: ");
 
     /* the scanf function reads from keyboard input */
     /* and 'puts' it the the input array until it sees a newline */
