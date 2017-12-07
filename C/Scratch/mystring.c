@@ -9,19 +9,18 @@
 
 int main(int argc, char **argv)
 {
-  char mystring[ ] = "aaa,bbb,ccc";
+  char mystring[ ] = "70.0,95,15:00";
   int index;
 	
   printf("length of mystring: %d\n",strlen(mystring));
   while( index < strlen(mystring)){
    printf("%d",mystring[index]);
    if ( mystring[index] == 44 ){
-   printf("\n");
+   //printf("\n");
    }
-    index++;
+   index++;
   }
-
-  printf("\n");
+   printf("\n");
 
 	return 0;
 }
