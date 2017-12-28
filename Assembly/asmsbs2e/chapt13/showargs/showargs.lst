@@ -1,0 +1,48 @@
+     1                                  ; Source name     : SHOWARGS.ASM
+     2                                  ; Executable name : SHOWARGS
+     3                                  ; Version         : 1.0
+     4                                  ; Created date    : 10/1/1999
+     5                                  ; Last update     : 12/3/1999
+     6                                  ; Author          : Jeff Duntemann
+     7                                  ; Description     : A demo that shows how to access command line arguments
+     8                                  ;                   stored on the stack by addressing them relative to ebp.
+     9                                  ;
+    10                                  ; Build using these commands:
+    11                                  ; nasm -f elf showargs.asm
+    12                                  ; gcc showargs.o -o showargs
+    13                                  ;
+    14                                  ; To test, execute with some command-line arguments:
+    15                                  ; ./showargs foo bar bas ba
+    16                                  [SECTION .text]       ; Section containing code
+    17                                  global main           ; Required so linker can find entry point
+    18                                  extern printf         ; Notify linker that we're calling printf
+    19                                  main:
+    20 00000000 55                      push ebp              ; Set up stack frame for debugger
+    21 00000001 89E5                       mov ebp,esp
+    22 00000003 53                         push ebx           ; Program must preserve ebp, ebx, esi, & edi
+    23 00000004 56                         push esi
+    24 00000005 57                         push edi
+    25                                     ;;; Everything before this is boilerplate; use it for all ordinary apps!
+    26 00000006 8B7D08                     mov edi,[ebp+8]    ; Load argument count into edi
+    27 00000009 8B5D0C                     mov ebx,[ebp+12] ; Load pointer to argument table into ebx
+    28 0000000C 31F6                       xor esi,esi        ; Clear esi to 0
+    29                                  .showit:
+    30 0000000E FF34B3                     push dword [ebx+esi*4] ; Push address of an arg on the stack
+    31 00000011 56                         push esi           ; Push arg number on the stack
+    32 00000012 68[00000000]               push dword argmsg ; Push address of display string on the stack
+    33 00000017 E8(00000000)               call printf        ; Display the arg number and arg
+    34 0000001C 83C40C                     add esp, byte 12 ; Clean up stack after printf call
+    35 0000001F 46                         inc esi            ; Bump arg number to next arg
+    36 00000020 4F                         dec edi            ; Decrement arg counter by 1
+    37 00000021 75EB                       jnz .showit        ; If arg count is 0, we're done
+    38                                     ;;; Everything after this is boilerplate; use it for all ordinary apps!
+    39 00000023 5F                         pop edi            ; Restore saved registers
+    40 00000024 5E                         pop esi
+    41 00000025 5B                         pop ebx
+    42 00000026 89EC                       mov esp,ebp        ; Destroy stack frame before returning
+    43 00000028 5D                         pop ebp
+    44 00000029 C3                         ret                ; Return control to Linux
+    45                                  [SECTION .data]       ; Section containing initialized data
+    46 00000000 417267756D656E7420-     argmsg     db "Argument %d: %s",10,0
+    47 00000009 25643A2025730A00   
+    48                                  [SECTION .bss]        ; Section containing uninitialized data

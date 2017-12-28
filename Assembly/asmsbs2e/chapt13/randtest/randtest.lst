@@ -1,0 +1,213 @@
+     1                                  ; Source name     :  RANDTEST.ASM
+     2                                  ; Executable name :  RANDTEST
+     3                                  ; Version         :  1.0
+     4                                  ; Created date    :  12/1/1999
+     5                                  ; Last update     :  12/2/1999
+     6                                  ; Author          :  Jeff Duntemann
+     7                                  ; Description     :  A demo of Unix rand & srand using NASM 0.98
+     8                                  ;
+     9                                  ; Build using these commands:
+    10                                  ;  nasm -f elf randtest.asm
+    11                                  ;  gcc randtest.o -o randtest
+    12                                  ;
+    13                                  extern printf
+    14                                  extern puts
+    15                                  extern rand
+    16                                  extern scanf
+    17                                  extern srand
+    18                                  extern time
+    19                                  [SECTION .text]           ; Section containing code
+    20                                  global main               ; Required so linker can find entry point
+    21                                  main:
+    22 00000000 55                         push ebp               ; Set up stack frame for debugger
+    23 00000001 89E5                       mov ebp,esp
+    24 00000003 53                         push ebx               ; Program must preserve ebp, ebx, esi, & edi
+    25 00000004 56                         push esi
+    26 00000005 57                         push edi
+    27                                     ;;; Everything before this is boilerplate; use it for all ordinary apps!
+    28                                     ;; Start by seeding the random number generator with a time value:
+    29 00000006 6800000000              Seedit: push dword 0      ; Push a 32-bit null pointer to stack, since
+    30                                                            ; we don't need a buffer.
+    31 0000000B E8(00000000)               call time              ; Returns time_t value (32-bit integer) in eax
+    32 00000010 81C404000000               add esp,4              ; Clean up stack
+    33 00000016 50                         push eax               ; Push time value in eax onto stack
+    34 00000017 E8(00000000)               call srand             ; Time value is the seed value for random gen.
+    35 0000001C 81C404000000               add esp,4              ; Clean up stack
+    36                                  ;; All of the following code blocks are identical except for the size of
+    37                                  ;; the random value being generated.
+    38                                  ;; Create and display an array of 31-bit random values:
+    39 00000022 BF[58010000]            mov edi, dword pull31 ; Copy address of random # subroutine into edi
+    40 00000027 E8C7010000              call puller           ; Pull as many numbers as called for in [pulls]
+    41 0000002C 6820000000              push dword 32         ; Size of numbers being pulled, in bits
+    42 00000031 FF35[00000000]          push dword [pulls]    ; Number of random numbers generated
+    43 00000037 68[04000000]            push dword display    ; Address of base display string
+    44 0000003C E8(00000000)            call printf           ; Display the label
+    45 00000041 81C40C000000            add esp,12            ; Clean up stack from printf call
+    46 00000047 E872010000              call shownums         ; Display the rows of random numbers
+    47                                  ;; Create and display an array of 16-bit random values:
+    48 0000004C BF[62010000]            mov edi, dword pull16 ; Copy address of random # subroutine into edi
+    49 00000051 E89D010000              call puller           ; Pull as many numbers as called for in [pulls]
+    50 00000056 6810000000              push dword 16         ; Size of numbers being pulled, in bits
+    51 0000005B FF35[00000000]          push dword [pulls]    ; Number of random numbers generated
+    52 00000061 68[04000000]            push dword display    ; Address of base display string
+    53 00000066 E8(00000000)            call printf           ; Display the label
+    54 0000006B 81C40C000000            add esp,12            ; Clean up stack from printf call
+    55 00000071 E848010000              call shownums         ; Display the rows of random numbers
+    56                                  ;; Create and display an array of 8-bit random values:
+    57 00000076 BF[6C010000]            mov edi, dword pull8  ; Copy address of random # subroutine into edi
+    58 0000007B E873010000              call puller           ; Pull as many numbers as called for in [pulls]
+    59 00000080 6808000000              push dword 8          ; Size of numbers being pulled, in bits
+    60 00000085 FF35[00000000]          push dword [pulls]    ; Number of random numbers generated
+    61 0000008B 68[04000000]            push dword display    ; Address of base display string
+    62 00000090 E8(00000000)            call printf           ; Display the label
+    63 00000095 81C40C000000            add esp,12            ; Clean up stack from printf call
+    64 0000009B E81E010000              call shownums         ; Display the rows of random numbers
+    65                                  ;; Create and display an array of 7-bit random values:
+    66 000000A0 BF[76010000]            mov edi, dword pull7  ; Copy address of random # subroutine into edi
+    67 000000A5 E849010000              call puller           ; Pull as many numbers as called for in [pulls]
+    68 000000AA 6807000000              push dword 7          ; Size of numbers being pulled, in bits
+    69 000000AF FF35[00000000]          push dword [pulls]    ; Number of random numbers generated
+    70 000000B5 68[04000000]            push dword display    ; Address of base display string
+    71 000000BA E8(00000000)            call printf           ; Display the label
+    72 000000BF 81C40C000000            add esp,12            ; Clean up stack from printf call
+    73 000000C5 E8F4000000              call shownums         ; Display the rows of random numbers
+    74                                  ;; Create and display an array of 4-bit random values:
+    75 000000CA BF[8A010000]            mov edi, dword pull4  ; Copy address of random # subroutine into edi
+    76 000000CF E81F010000              call puller           ; Pull as many numbers as called for in [pulls]
+    77 000000D4 6804000000              push dword 4          ; Size of numbers being pulled, in bits
+    78 000000D9 FF35[00000000]          push dword [pulls]    ; Number of random numbers generated
+    79 000000DF 68[04000000]            push dword display    ; Address of base display string
+    80 000000E4 E8(00000000)            call printf           ; Display the label
+    81 000000E9 81C40C000000            add esp,12            ; Clean up stack from printf call
+    82 000000EF E8CA000000              call shownums         ; Display the rows of random numbers
+    83                                     ;; Clear a buffer to nulls
+    84 000000F4 B94B000000              Bufclr: mov ecx, BUFSIZE+5 ; Fill whole buffer plus 5 for safety
+    85 000000F9 49                      .loop: dec ecx           ; BUFSIZE is 1-based so decrement first!
+    86 000000FA C681[24010000]00           mov byte [randchar+ecx],0 ; Mov null into the buffer
+    87 00000101 81F900000000               cmp ecx,0             ; Are we done yet?
+    88 00000107 75F0                       jnz .loop             ; If not, go back and stuff another null
+    89                                     ;; Create a string of random alphanumeric characters
+    90 00000109 BB46000000              Pulchr: mov ebx, BUFSIZE ; BUFSIZE tells us how many chars to pull
+    91 0000010E 4B                      .loop: dec ebx           ; BUFSIZE is 1-based, so decrement first!
+    92 0000010F BF[80010000]            mov edi, dword pull6  ; For random in the range 0-63
+    93 00000114 E8DA000000              call puller           ; Go get a random number from 0-63
+    94 00000119 8A88[53000000]          mov cl,[chartbl+eax]  ; Use random # in eax as offset into table
+    95                                                        ;  and copy character from table into cl
+    96 0000011F 888B[24010000]          mov [randchar+ebx],cl ; Copy char from cl to character buffer
+    97 00000125 81FB00000000            cmp ebx,0             ; Are we done having fun yet?
+    98 0000012B 75E1                    jne .loop             ; If not, go back and pull another
+    99                                  ;; Display the string
+   100 0000012D B801000000              mov eax,1             ; Output a newline
+   101 00000132 E862000000              call newline          ;  using the newline subroutine
+   102 00000137 68[24010000]            push dword randchar   ; Push the address of the char buffer
+   103 0000013C E8(00000000)            call puts             ; Call puts to display it
+   104 00000141 81C404000000            add esp,4             ; Clean up the stack
+   105 00000147 B801000000              mov eax,1             ; Output a newline
+   106 0000014C E848000000              call newline          ;  using the newline subroutine
+   107                                  ;;; Everything after this is boilerplate; use it for all ordinary apps!
+   108 00000151 5F                      pop edi               ; Restore saved registers
+   109 00000152 5E                      pop esi
+   110 00000153 5B                      pop ebx
+   111 00000154 89EC                    mov esp,ebp           ; Destroy stack frame before returning
+   112 00000156 5D                      pop ebp
+   113 00000157 C3                      ret                   ; Return control to Linux
+   114                                  ;;; SUBROUTINES=============================================================
+   115                                  ;---------------------------------------------------------------
+   116                                  ; Random number generator subroutines -- Last update 12/1/1999
+   117                                  ;
+   118                                  ; This routine provides 5 entry points, and returns 5 different "sizes" of
+   119                                  ; pseudorandom numbers based on the value returned by rand. Note first of
+   120                                  ; all that rand pulls a 31-bit value. The high 16 bits are the most "random"
+   121                                  ; so to return numbers in a smaller range, you fetch a 31-bit value and then
+   122                                  ; right shift it zero-fill all but the number of bits you want. An 8-bit
+   123                                  ; random value will range from 0-255, a 7-bit value from 0-127, and so on.
+   124                                  ; Respects ebp, esi, edi, ebx, and esp. Returns random value in eax.
+   125                                  ;---------------------------------------------------------------
+   126 00000158 B900000000              pull31: mov ecx,0 ; For 31 bit random, we don't shift
+   127 0000015D E92D000000                      jmp pull
+   128 00000162 B90F000000              pull16: mov ecx,15 ; For 16 bit random, shift by 15 bits
+   129 00000167 E923000000                      jmp pull
+   130 0000016C B917000000              pull8: mov ecx,23 ; For 8 bit random, shift by 23 bits
+   131 00000171 E919000000                      jmp pull
+   132 00000176 B918000000              pull7: mov ecx,24 ; For 7 bit random, shift by 24 bits
+   133 0000017B E90F000000                      jmp pull
+   134 00000180 B919000000              pull6: mov ecx,25 ; For 6 bit random, shift by 25 bits
+   135 00000185 E905000000                      jmp pull
+   136 0000018A B91B000000              pull4: mov ecx,27 ; For 4 bit random, shift by 27 bits
+   137 0000018F 51                      pull:   push ecx   ; rand trashes ecx; save shift value on stack
+   138 00000190 E8(00000000)                    call rand ; Call rand for random value; returned in eax
+   139 00000195 59                              pop ecx    ; Pop stashed shift value back into ecx
+   140 00000196 D3E8                            shr eax,cl ; Shift the random value by the chosen factor
+   141                                                     ; keeping in mind that part we want is in cl
+   142 00000198 C3                              ret        ; Go home with random number in eax
+   143                                  ;---------------------------------------------------------------
+   144                                  ; Newline outputter -- Last update 12/1/1999
+   145                                  ;
+   146                                  ; This routine allows you to output a number of newlines to stdout, given by
+   147                                  ; the value passed in eax. Legal values are 1-10. All sacred registers are
+   148                                  ; respected. Passing a 0 value in eax will result in no newlines being issued.
+   149                                  ;---------------------------------------------------------------
+   150                                  newline:
+   151 00000199 B90A000000                 mov ecx,10        ; We need a skip value, which is 10 minus the
+   152 0000019E 29C1                       sub ecx,eax       ; number of newlines the caller wants.
+   153 000001A0 81C1[B3010000]             add ecx, dword nl ; This skip value is added to the address of
+   154 000001A6 51                         push dword ecx    ; the newline buffer nl before calling printf.
+   155 000001A7 E8(00000000)               call printf       ; Display the selected number of newlines
+   156 000001AC 81C404000000               add esp,4         ; Clean up the stack
+   157 000001B2 C3                         ret               ; Go home
+   158 000001B3 0A0A0A0A0A0A0A0A0A-     nl db 10,10,10,10,10,10,10,10,10,10,0
+   159 000001BC 0A00               
+   160                                  
+   161                                     ;; This subroutine displays numbers six at a time
+   162                                     ;; Not intended to be general-purpose...
+   163                                  shownums:
+   164 000001BE 8B35[00000000]             mov esi, dword [pulls]    ; Put pull count into esi
+   165 000001C4 BF06000000              .dorow: mov edi,6            ; Put row element counter into edi
+   166 000001C9 4F                      .pushr: dec edi              ; Decrement row element counter
+   167 000001CA 4E                         dec esi                   ; Decrement pulls counter
+   168 000001CB FF34B5[04000000]           push dword [stash+esi*4] ; Push number from array onto stack
+   169 000001D2 81FF00000000               cmp edi,0                 ; Have we filled the row yet?
+   170 000001D8 75EF                       jne .pushr                ; If not, go push another one
+   171 000001DA 68[34000000]               push dword showarray      ; Push address of base display string
+   172 000001DF E8(00000000)               call printf               ; Display the random numbers
+   173 000001E4 81C41C000000               add esp,28                ; Clean up the stack
+   174 000001EA 81FE00000000               cmp esi,0                 ; See if pull count has gone to <> 0
+   175 000001F0 75D2                       jnz .dorow                ; If not, we go back and do another row!
+   176 000001F2 C3                         ret                       ; Done, so go home!
+   177                                     ;; This subroutine pulls random values and stuffs them into an
+   178                                     ;; integer array. Not intended to be general purpose. Note that
+   179                                     ;; the address of the random number generator entry point must
+   180                                     ;; be loaded into edi before this is called, or you'll seg fault!
+   181                                  puller:
+   182 000001F3 8B35[00000000]             mov esi, dword [pulls] ; Put pull count into esi
+   183 000001F9 4E                      .grab: dec esi             ; Decrement counter in esi
+   184 000001FA FFD7                       call edi                ; Pull the value; it's returned in eax
+   185 000001FC 8904B5[04000000]           mov [stash+esi*4],eax ; Store random value in the array
+   186 00000203 81FE00000000               cmp esi,0               ; See if we've pulled 4 yet
+   187 00000209 75EE                       jne .grab               ; Do another if esi <> 0
+   188 0000020B C3                         ret                     ; Otherwise, go home!
+   189                                  [SECTION .data]            ; Section containing initialized data
+   190 00000000 24000000                pulls      dd 36           ; How many numbers do we pull?
+   191 00000004 0A4865726520697320-     display    db 10,'Here is an array of %d %d-bit random numbers:',10,0
+   192 0000000D 616E20617272617920-
+   193 00000016 6F662025642025642D-
+   194 0000001F 6269742072616E646F-
+   195 00000028 6D206E756D62657273-
+   196 00000031 3A0A00             
+   197 00000034 253130642025313064-     showarray  db '%10d %10d %10d %10d %10d %10d',10,0
+   198 0000003D 202531306420253130-
+   199 00000046 642025313064202531-
+   200 0000004F 30640A00           
+   201 00000053 303132333435363738-     chartbl    db '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-@'
+   202 0000005C 394142434445464748-
+   203 00000065 494A4B4C4D4E4F5051-
+   204 0000006E 52535455565758595A-
+   205 00000077 616263646566676869-
+   206 00000080 6A6B6C6D6E6F707172-
+   207 00000089 737475767778797A2D-
+   208 00000092 40                 
+   209                                  [SECTION .bss]             ; Section containing uninitialized data
+   210                                  BUFSIZE equ 70
+   211 00000000 <res 00000004>          randval resd 1             ; Reserve an integer variable
+   212 00000004 <res 00000120>          stash resd 72              ; Reserve an array of 72 integers for randoms
+   213 00000124 <res 0000004B>          randchar resb BUFSIZE+5    ; Buffer for storing randomly chosen characters

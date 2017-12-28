@@ -1,0 +1,265 @@
+     1                                  ; Source name     : TEXTFILE.ASM
+     2                                  ; Executable name : TEXTFILE
+     3                                  ; Version         : 1.0
+     4                                  ; Created date    : 11/21/1999
+     5                                  ; Last update     : 12/4/1999
+     6                                  ; Author          : Jeff Duntemann
+     7                                  ; Description     : A text file I/O demo for Linux, using NASM 0.98
+     8                                  ;
+     9                                  ; Build using these commands:
+    10                                  ;   nasm -f elf textfile.asm
+    11                                  ;   nasm -f elf linlib.asm
+    12                                  ;   gcc textfile.o linlib.o -o textfile
+    13                                  ;
+    14                                  ; Note that this program requires several subroutines in an external
+    15                                  ; library named LINLIB.ASM.
+    16                                  [SECTION .text]         ; Section containing code
+    17                                  ;; These externals are all from the standard C library:
+    18                                  extern fopen
+    19                                  extern fclose
+    20                                  extern fgets
+    21                                  extern fprintf
+    22                                  extern printf
+    23                                  extern sscanf
+    24                                  extern time
+    25                                  ;; These externals are from the associated library LINLIB.ASM:
+    26                                  extern seedit           ; Seeds the random number generator
+    27                                  extern pull6            ; Generates a 6-bit random number from 0-63
+    28                                  extern newline          ; Outputs a specified number of newline chars
+    29                                  global main              ; Required so linker can find entry point
+    30                                  main:
+    31 00000000 55                            push ebp           ; Set up stack frame for debugger
+    32 00000001 89E5                          mov ebp,esp
+    33 00000003 53                            push ebx           ; Program must preserve ebp, ebx, esi, & edi
+    34 00000004 56                            push esi
+    35 00000005 57                            push edi
+    36                                        ;;; Everything before this is boilerplate; use it for all ordinary apps!
+    37 00000006 E8(00000000)               call seedit           ; Seed the random number generator
+    38                                     ;; First test is to see if there are command line arguments at all.
+    39                                     ;; If there are none, we show the help info as several lines. Don't
+    40                                     ;; forget that the first arg is always the program name, so there's
+    41                                     ;; always at least 1 command-line argument!
+    42 0000000B 8B4508                     mov eax,[ebp+8]       ; Load argument count from stack into eax
+    43 0000000E 3D01000000                 cmp eax,1             ; If count is 1, there are no args
+    44 00000013 770F                       ja chkarg2            ; Continue if arg count is > 1
+    45 00000015 BB[23000000]               mov ebx, dword diskhelpnm ; Put address of help file name in ebx
+    46 0000001A E8E8000000                 call diskhelp         ; If only 1 arg, show help info...
+    47 0000001F E9DC000000                 jmp gohome            ; ...and exit the program
+    48                                     ;; Next we check for  a numeric command line argument 1:
+    49                                  chkarg2:
+    50 00000024 8B5D0C                     mov ebx,[ebp+12]      ; Put pointer to argument table into ebx
+    51 00000027 68[00000000]               push dword linecount  ; Push address of line count integer for sscanf
+    52 0000002C 68[00000000]               push dword intformat  ; Push address of integer formatting code
+    53 00000031 FF7304                     push dword [ebx+4]    ; Push pointer to arg(1)
+    54 00000034 E8(00000000)               call sscanf           ; Call sscanf to convert arg(1) to an integer
+    55 00000039 81C40C000000               add esp,12            ; Clean up the stack
+    56 0000003F 3D01000000                 cmp eax,1             ; Return value of 1 says we got a number
+    57 00000044 740F                       je chkdata            ; If we got a number, go on; else abort
+    58 00000046 B8[78000000]               mov eax, dword err1   ; Load eax with address of error message #1
+    59 0000004B E84F010000                 call showerr          ; Show the error message
+    60 00000050 E9AB000000                 jmp gohome            ; Exit the program
+    61                                     ;; Here we're looking to see if there are more arguments. If there
+    62                                     ;; are, we concatenate them into a single string no more than BUFSIZE
+    63                                     ;; chars in size. (Yes, I *know* this does what strncat does...)
+    64                                  chkdata:
+    65 00000055 817D0803000000             cmp dword [ebp+8],3  ; Is there a second argument?
+    66 0000005C 730A                       jae getlns           ; If so, we have text to fill a file with
+    67 0000005E E849010000                 call randline        ; If not, generate a line of random text
+    68                                                          ; Note that randline returns ptr to line in esi
+    69 00000063 E942000000                 jmp genfile          ; Go on to create the file
+    70                                     ;; Here we copy as much command line text as we have, up to BUFSIZE
+    71                                     ;; chars, into the line buffer buff. We skip the first two args
+    72                                     ;; (which at this point we know exist) but we know we have at least
+    73                                     ;; one text arg in arg(2). Going into this section, we know that
+    74                                     ;; ebx contains the pointer to the arg table. All other bets are off.
+    75 00000068 BA02000000              getlns: mov edx,2       ; We know we have at least arg(2), start there
+    76 0000006D BF[4C000000]               mov edi,dword buff   ; Destination pointer is start of char buffer
+    77 00000072 31C0                       xor eax,eax          ; Clear eax to 0 for the character counter
+    78 00000074 FC                         cld                  ; Clear direction flag for up-memory movsb
+    79 00000075 8B3493                  grab: mov esi,[ebx+edx*4] ; Copy pointer to next arg into esi
+    80 00000078 803E00                  .copy: cmp byte [esi],0 ; Have we found the end of the arg?
+    81 0000007B 740E                       je .next             ; If so, bounce to the next arg
+    82 0000007D A4                         movsb                ; Copy char from [esi] to [edi]; inc edi & esi
+    83 0000007E 40                         inc eax              ; Increment total character count
+    84 0000007F 3D40000000                 cmp eax,BUFSIZE      ; See if we've filled the buffer to max count
+    85 00000084 741C                       je addnul            ; If so, go add a null to buff & we're done
+    86 00000086 E9EDFFFFFF                 jmp .copy
+    87 0000008B C60720                  .next: mov byte [edi],' ' ; Copy space to buff to separate args
+    88 0000008E 47                         inc edi              ; Increment destination pointer for space
+    89 0000008F 40                         inc eax              ; Add one to character count too
+    90 00000090 3D40000000                 cmp eax,BUFSIZE      ; See if we've now filled buff
+    91 00000095 740B                       je addnul            ; If so, go down to add a null and we're done
+    92 00000097 42                         inc edx              ; Otherwise, increment the argument count
+    93 00000098 3B5508                     cmp edx, dword [ebp+8] ; Compare against argument count
+    94 0000009B 7305                       jae addnul           ; If edx = arg count, we're done
+    95 0000009D E9D3FFFFFF                 jmp grab             ; And go back and copy it
+    96 000000A2 C60700                  addnul: mov byte [edi],0 ; Tuck a null on the end of buff
+    97 000000A5 BE[4C000000]               mov esi, dword buff ; File write code expects ptr to text in esi
+    98                                     ;; Now we create a file to fill with the text we have:
+    99                                  genfile:
+   100 000000AA 68[34000000]               push dword writecode ; Push pointer to file write/create code ('w')
+   101 000000AF 68[16000000]               push dword newfilename ; Push pointer to new file name
+   102 000000B4 E8(00000000)               call fopen            ; Create/open file
+   103 000000B9 81C408000000               add esp,8             ; Clean up the stack
+   104 000000BF 89C3                       mov ebx,eax           ; eax contains the file handle; save in ebx
+   105                                     ;; File is open. Now let's fill it with text:
+   106 000000C1 8B3D[00000000]             mov edi,[linecount] ; The number of lines to be filled is in edi
+   107 000000C7 56                         push  esi             ; esi is the pointer to the line of text
+   108 000000C8 6801000000                 push  dword 1         ; The first line number
+   109 000000CD 68[08000000]               push  dword writebase ; Push address of the base string
+   110 000000D2 53                         push  ebx             ; Push the file handle of the open file
+   111                                  writeline:
+   112 000000D3 81FF00000000               cmp dword edi,0       ; Has the line count gone to 0?
+   113 000000D9 7413                       je donewrite          ; If so, go down & clean up stack
+   114 000000DB E8(00000000)               call fprintf          ; Write the text line to the file
+   115 000000E0 4F                         dec edi               ; Decrement the count of lines to be written
+   116 000000E1 8144240801000000           add dword [esp+8],1   ; Update the line number on the stack
+   117 000000E9 E9E5FFFFFF                 jmp writeline         ; Loop back and do it again
+   118                                  donewrite:
+   119 000000EE 81C410000000               add esp,16           ; Clean up stack after call to fprintf
+   120                                     ;; We're done writing text; now let's close the file:
+   121                                  closeit:
+   122 000000F4 53                         push ebx             ; Push the handle of the file to be closed
+   123 000000F5 E8(00000000)               call fclose          ; Closes the file whose handle is on the stack
+   124 000000FA 81C404000000               add esp,4
+   125                                     ;;; Everything after this is boilerplate; use it for all ordinary apps!
+   126 00000100 5F                      gohome: pop edi         ; Restore saved registers
+   127 00000101 5E                         pop esi
+   128 00000102 5B                         pop ebx
+   129 00000103 89EC                       mov esp,ebp          ; Destroy stack frame before returning
+   130 00000105 5D                         pop ebp
+   131 00000106 C3                         ret                  ; Return control to to the C shutdown code
+   132                                  ;;;
+   133                                  ;SUBROUTINES================================================================
+   134                                  ;--------------------------------------------------------------
+   135                                  ; Disk-based mini-help subroutine -- Last update 12/5/1999
+   136                                  ;
+   137                                  ; This routine reads text from a text file, the name of which is passed by
+   138                                  ; way of a pointer to the name string in ebx. The routine opens the text file,
+   139                                  ; reads the text from it, and displays it to standard output. If the file
+   140                                  ; cannot be opened, a very short memory-based message is displayed instead.
+   141                                  ;---------------------------------------------------------------
+   142                                  diskhelp:
+   143 00000107 68[36000000]                push dword opencode ; Push pointer to open-for-read code "r"
+   144 0000010C 53                          push ebx             ; Pointer to name of help file is passed in ebx
+   145 0000010D E8(00000000)                call fopen           ; Attempt to open the file for reading
+   146 00000112 81C408000000                add esp,8            ; Clean up the stack
+   147 00000118 3D00000000                  cmp eax,0            ; fopen returns null if attempted open failed
+   148 0000011D 7506                        jne .disk            ; Read help info from disk, else from memory
+   149 0000011F E842000000                 call memhelp
+   150 00000124 C3                          ret
+   151 00000125 89C3                    .disk: mov ebx,eax       ; Save handle of opened file in ebx
+   152 00000127 53                      .rdln: push ebx          ; Push file handle on the stack
+   153 00000128 6848000000                  push dword HELPLEN   ; Limit line length of text read
+   154 0000012D 68[04000000]                push dword helpline ; Push address of help text line buffer
+   155 00000132 E8(00000000)                call fgets           ; Read a line of text from the file
+   156 00000137 81C40C000000                add esp,12           ; Clean up the stack
+   157 0000013D 3D00000000                  cmp eax,0            ; A returned null indicates error or EOF
+   158 00000142 7E15                        jle .done            ; If we get 0 in eax, close up & return
+   159 00000144 68[04000000]                push dword helpline ; Push address of help line on the stack
+   160 00000149 E8(00000000)                call printf          ; Call printf to display help line
+   161 0000014E 81C404000000                add esp,4            ; Clean up the stack
+   162 00000154 E9CEFFFFFF                  jmp .rdln
+   163 00000159 53                      .done: push ebx          ; Push the handle of the file to be closed
+   164 0000015A E8(00000000)                call fclose          ; Closes the file whose handle is on the stack
+   165 0000015F 81C404000000                add esp,4            ; Clean up the stack
+   166 00000165 C3                          ret                  ; Go home
+   167                                  memhelp:
+   168 00000166 B801000000                  mov eax,1
+   169 0000016B E8(00000000)               call newline
+   170 00000170 BB[B4000000]                mov ebx, dword helpmsg ; Load address of help text into eax
+   171 00000175 813B00000000            .chkln: cmp dword [ebx],0 ; Does help msg pointer point to a null?
+   172 0000017B 750B                        jne .show              ; If not, show the help lines
+   173 0000017D B801000000                  mov eax,1              ; Load eax with number of newslines to output
+   174 00000182 E8(00000000)                call newline           ; Output the newlines
+   175 00000187 C3                         ret                    ; If yes, go home
+   176 00000188 53                      .show: push ebx           ; Push address of help line on the stack
+   177 00000189 E8(00000000)               call printf            ; Display the line
+   178 0000018E 81C404000000               add esp,4              ; Clean up the stack
+   179 00000194 81C33D000000               add ebx,HELPSIZE       ; Increment address by length of help line
+   180 0000019A E9D6FFFFFF                 jmp .chkln             ; Loop back and check to see if we done yet
+   181                                  showerr:
+   182 0000019F 50                         push eax             ; On entry, eax contains address of error message
+   183 000001A0 E8(00000000)               call printf          ; Show the error message
+   184 000001A5 81C404000000               add esp,4            ; Clean up the stack
+   185 000001AB C3                         ret                  ; Go home; no returned values
+   186                                  randline:
+   187 000001AC BB40000000                 mov ebx, BUFSIZE     ; BUFSIZE tells us how many chars to pull
+   188 000001B1 C605[8D000000]00           mov byte [buff+BUFSIZE+1],0 ; Put a null at the end of the buffer first
+   189 000001B8 4B                      .loop: dec ebx          ; BUFSIZE is 1-based, so decrement
+   190 000001B9 E8(00000000)               call pull6           ; Go get a random number from 0-63
+   191 000001BE 8A88[38000000]             mov cl,[chartbl+eax] ; Use random # in eax as offset into table
+   192                                                          ; and copy character from table into cl
+   193 000001C4 888B[4C000000]             mov [buff+ebx],cl    ; Copy char from cl to character buffer
+   194 000001CA 81FB00000000               cmp ebx,0            ; Are we done having fun yet?
+   195 000001D0 75E6                       jne .loop            ; If not, go back and pull another
+   196 000001D2 BE[4C000000]               mov esi, dword buff ; Copy address of the buffer into esi
+   197 000001D7 C3                         ret                  ; and go home
+   198                                  [SECTION .data]           ; Section containing initialized data
+   199 00000000 2564000000000000        intformat    dd '%d',0
+   200 00000008 4C696E65202325643A-     writebase    db 'Line #%d: %s',10,0
+   201 00000011 2025730A00         
+   202 00000016 7465737465726F6F2E-     newfilename db 'testeroo.txt',0
+   203 0000001F 74787400           
+   204 00000023 68656C707465787466-     diskhelpnm db 'helptextfile.txt',0
+   205 0000002C 696C652E74787400   
+   206 00000034 7700                    writecode    db 'w',0
+   207 00000036 7200                    opencode     db 'r',0
+   208 00000038 303132333435363738-     chartbl db '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-@'
+   209 00000041 394142434445464748-
+   210 0000004A 494A4B4C4D4E4F5051-
+   211 00000053 52535455565758595A-
+   212 0000005C 616263646566676869-
+   213 00000065 6A6B6C6D6E6F707172-
+   214 0000006E 737475767778797A2D-
+   215 00000077 40                 
+   216 00000078 4552524F523A205468-     err1      db 'ERROR: The first command line argument must be an integer!',10,0
+   217 00000081 652066697273742063-
+   218 0000008A 6F6D6D616E64206C69-
+   219 00000093 6E6520617267756D65-
+   220 0000009C 6E74206D7573742062-
+   221 000000A5 6520616E20696E7465-
+   222 000000AE 676572210A00       
+   223 000000B4 54455854544553543A-     helpmsg db 'TEXTTEST: Generates a test file. Arg(1) should be the # of ',10,0
+   224 000000BD 2047656E6572617465-
+   225 000000C6 732061207465737420-
+   226 000000CF 66696C652E20417267-
+   227 000000D8 2831292073686F756C-
+   228 000000E1 642062652074686520-
+   229 000000EA 23206F66200A00     
+   230                                  HELPSIZE EQU $-helpmsg
+   231 000000F1 6C696E657320746F20-               db 'lines to write to the file. All other args are concatenated',10,0
+   232 000000FA 777269746520746F20-
+   233 00000103 7468652066696C652E-
+   234 0000010C 20416C6C206F746865-
+   235 00000115 722061726773206172-
+   236 0000011E 6520636F6E63617465-
+   237 00000127 6E617465640A00     
+   238 0000012E 696E746F2061207369-               db 'into a single line and written to the file. If no text args',10,0
+   239 00000137 6E676C65206C696E65-
+   240 00000140 20616E642077726974-
+   241 00000149 74656E20746F207468-
+   242 00000152 652066696C652E2049-
+   243 0000015B 66206E6F2074657874-
+   244 00000164 20617267730A00     
+   245 0000016B 61726520656E746572-               db 'are entered, random text is written to the file. This msg ',10,0
+   246 00000174 65642C2072616E646F-
+   247 0000017D 6D2074657874206973-
+   248 00000186 207772697474656E20-
+   249 0000018F 746F20746865206669-
+   250 00000198 6C652E205468697320-
+   251 000001A1 6D7367200A00       
+   252 000001A7 61707065617273206F-               db 'appears only if the file HELPTEXTFILE.TXT cannot be opened. ',10,0
+   253 000001B0 6E6C79206966207468-
+   254 000001B9 652066696C65204845-
+   255 000001C2 4C505445585446494C-
+   256 000001CB 452E5458542063616E-
+   257 000001D4 6E6F74206265206F70-
+   258 000001DD 656E65642E200A00   
+   259 000001E5 00000000                helpend dd 0
+   260                                  [SECTION .bss]             ; Section containing uninitialized data
+   261 00000000 <res 00000004>          linecount  resd 1          ; Reserve integer to hold line count
+   262                                  HELPLEN    EQU 72          ; Define length of a line of help text data
+   263 00000004 <res 00000048>          helpline   resb HELPLEN    ; Reserve space for disk-based help text line
+   264                                  BUFSIZE    EQU 64          ; Define length of text line buffer buff
+   265 0000004C <res 00000045>          buff       resb BUFSIZE+5  ; Reserve space for a line of text.

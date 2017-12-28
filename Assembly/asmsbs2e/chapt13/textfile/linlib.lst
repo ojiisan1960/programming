@@ -1,0 +1,97 @@
+     1                                  ;  Source name     : LINLIB.ASM
+     2                                  ;  Executable name : None -- This is a library of subroutines!
+     3                                  ;  Version         : 2.0
+     4                                  ;  Created date    : 12/4/1999
+     5                                  ;  Last update     : 5/29/2009
+     6                                  ;  Author          : Jeff Duntemann
+     7                                  ;  Description     : A procedure library in assembly using NASM 2.03
+     8                                  ;
+     9                                  ;  Assemble using this command:
+    10                                  ;    nasm -f elf -g -F stabs linlib.asm
+    11                                  
+    12                                  [SECTION .data]		; Section containing initialised data
+    13                                  
+    14                                  [SECTION .bss]		; Section containing uninitialized data
+    15                                  
+    16                                  [SECTION .text]		; Section containing code
+    17                                  
+    18                                  extern printf		; All of these are in the standard C library glibc	
+    19                                  extern rand	
+    20                                  extern srand
+    21                                  extern time
+    22                                  		
+    23                                  global seedit		; Seeds the random number generator with a time value
+    24                                  global pull31		; Pulls a 31-bit random number
+    25                                  global pull16		; Pulls a 16-bit random number; in the range 0-65,535
+    26                                  global pull8		; Pulls an 8-bit random number; in the range 0-255
+    27                                  global pull7		; Pulls a 7-bit random number; in the range 0-127
+    28                                  global pull6		; Pulls a 6-bit random number; in the range 0-63
+    29                                  global pull4		; Pulls a (marginal) 4-bit random number; range 0-15
+    30                                  global newline		; Outputs a specified number of newlines to stdout
+    31                                  	
+    32                                  
+    33                                  ;---------------------------------------------------------------------------
+    34                                  ;  Random number generator subroutines  --  Last update 5/29/2009
+    35                                  ;
+    36                                  ;  This routine provides 5 entry points, and returns 5 different "sizes" of
+    37                                  ;  pseudorandom numbers based on the value returned by rand.  Note first of 
+    38                                  ;  all that rand pulls a 31-bit value. The high 16 bits are the most "random"
+    39                                  ;  so to return numbers in a smaller range, you fetch a 31-bit value and then
+    40                                  ;  right shift it zero-fill all buty the number of bits you want. An 8-bit
+    41                                  ;  random value will range from 0-255, a 7-bit value from 0-127, and so on.
+    42                                  ;  Respects EBP, ESI, EDI, EBX, and ESP. Returns random value in EAX.
+    43                                  ;---------------------------------------------------------------------------
+    44 00000000 B900000000              pull31: mov ecx,0		; For 31 bit random, we don't shift
+    45 00000005 E92D000000              	jmp pull
+    46 0000000A B90F000000              pull16: mov ecx,15		; For 16 bit random, shift by 15 bits
+    47 0000000F E923000000              	jmp pull
+    48 00000014 B917000000              pull8:	mov ecx,23		; For 8 bit random, shift by 23 bits
+    49 00000019 E919000000              	jmp pull
+    50 0000001E B918000000              pull7:  mov ecx,24		; For 7 bit random, shift by 24 bits
+    51 00000023 E90F000000              	jmp pull
+    52 00000028 B919000000              pull6:	mov ecx,25		; For 6 bit random, shift by 25 bits
+    53 0000002D E905000000              	jmp pull
+    54 00000032 B91B000000              pull4:	mov ecx,27		; For 4 bit random, shift by 27 bits
+    55 00000037 51                      pull:	push ecx		; rand trashes ecx; save shift value on stack
+    56 00000038 E8(00000000)            	call rand		; Call rand for random value; returned in eax
+    57 0000003D 59                      	pop ecx			; Pop stashed shift value back into ECX
+    58 0000003E D3E8                    	shr eax,cl		; Shift the random value by the chosen factor
+    59                                  				;  keeping in mind that part we want is in CL
+    60 00000040 C3                      	ret			; Go home with random number in eax
+    61                                  
+    62                                  ;---------------------------------------------------------------------------
+    63                                  ;  Random number seed routine  --  Last update 5/29/2009
+    64                                  ;
+    65                                  ;  This routine fetches a time_t value from the system clock using the C
+    66                                  ;  library's time function, and uses that time value to seed the random number    
+    67                                  ;  generator through the function srand.  No values need be passed into it    
+    68                                  ;  nor returned from it.                                                     
+    69                                  ;---------------------------------------------------------------------------
+    70                                  	
+    71 00000041 6800000000              seedit:	push dword 0		; Push a 32-bit null pointer to stack, since
+    72                                  				;  we don't need a buffer. 
+    73 00000046 E8(00000000)            	call time		; Returns time_t value (32-bit integer) in eax
+    74 0000004B 81C404000000            	add esp,4		; Clean up stack
+    75 00000051 50                      	push eax		; Push time value in eax onto stack
+    76 00000052 E8(00000000)            	call srand		; Time value is the seed value for random gen.
+    77 00000057 81C404000000            	add esp,4		; Clean up stack
+    78 0000005D C3                      	ret			; Go home; no return values
+    79                                  
+    80                                  
+    81                                  ;------------------------------------------------------------------------------
+    82                                  ;  Newline outputter  --  Last update 5/29/2009
+    83                                  ;
+    84                                  ;  This routine allows you to output a number of newlines to stdout, given by
+    85                                  ;  the value passed in eax.  Legal values are 1-10. All sacred registers are
+    86                                  ;  respected. Passing a 0 value in eax will result in no newlines being issued.
+    87                                  ;------------------------------------------------------------------------------
+    88                                  newline:
+    89 0000005E B90A000000              	mov ecx,10		; We need a skip value, which is 10 minus the
+    90 00000063 29C1                    	sub ecx,eax		;  number of newlines the caller wants.
+    91 00000065 81C1[78000000]          	add ecx,nl		; This skip value is added to the address of
+    92 0000006B 51                      	push ecx		;  the newline buffer nl before calling printf.
+    93 0000006C E8(00000000)            	call printf		; Display the selected number of newlines
+    94 00000071 81C404000000            	add esp,4		; Clean up the stack
+    95 00000077 C3                      	ret			; Go home
+    96 00000078 0A0A0A0A0A0A0A0A0A-     nl	db 10,10,10,10,10,10,10,10,10,10,0	
+    97 00000081 0A00               

@@ -1,0 +1,23 @@
+     1                                  
+     2                                  section .data
+     3 00000000 4B414E4741524F4F          Snippet db "KANGAROO"
+     4                                  section .text
+     5                                  
+     6                                      global _start
+     7                                  
+     8                                  _start:
+     9 00000000 90                              nop
+    10                                  ; put experiments between nops
+    11 00000001 BB[00000000]                mov ebx,Snippet         ;put the address of Snippet here
+    12 00000006 B808000000                  mov eax,8               ;number of characters in Snippet
+    13 0000000B 67800320                  DoMore: add byte [ebx],32 ; add 32 to change character case?
+    14 0000000F FFC3                        inc ebx                 ; increment ebx
+    15 00000011 FFC8                        dec eax                 ; decrement counter eax
+    16 00000013 75F6                        jnz DoMore              ; loop back to DoMore while eax is not 0
+    17                                  
+    18                                  
+    19                                  
+    20                                  ; put experiments between nops
+    21 00000015 90                              nop
+    22                                  
+    23                                  section .bss

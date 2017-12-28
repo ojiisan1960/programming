@@ -7,10 +7,6 @@ section .text
 _start:
         nop
 ; put experiments between nops
-mov eax, 0FFFFFFFFh
-mov ebx, 02Dh
-dec ebx
-inc eax
 
 ; put experiments between nops
         nop
