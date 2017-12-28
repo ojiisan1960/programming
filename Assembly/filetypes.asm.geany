@@ -1,0 +1,62 @@
+# For complete documentation of this file, please see Geany's main documentation
+# Copy to $HOME/.config/geany/filedefs
+#
+[styling]
+# foreground;background;bold;italic
+default=0x000000;0xffffff;false;false
+comment=0x808080;0xffffff;false;false
+number=0x007f00;0xffffff;false;false
+string=0xff901e;0xffffff;false;false
+operator=0x000000;0xffffff;false;false
+identifier=0x880000;0xffffff;false;false
+cpuinstruction=0x111199;0xffffff;true;false
+mathinstruction=0x7f0000;0xffffff;true;false
+register=0x000000;0xffffff;true;false
+directive=0x3d670f;0xffffff;true;false
+directiveoperand=0xff901e;0xffffff;false;false
+commentblock=0x808080;0xffffff;false;false
+character=0xff901e;0xffffff;false;false
+stringeol=0x000000;0xe0c0e0;false;false
+extinstruction=0x007f7f;0xffffff;false;false
+
+[keywords]
+# all items must be in one line
+instructions=aaa aad aam aas adc add addst and bt call clc cld cli cmp dec dek div divst hlt imul inc ink int iret ja jae jb jbe jc jcxz je jecxz jg jge jgz jl jle jlz jmp jna jnae jnb jnbe jnc jne jng jnge jnl jnle jno jnp jns jnz jo jp jpe jpo js jsr jz lad ldi lds ldx lea lia loop loope loopne loopnz loopz lsa mov movs movsb movsd movsw movsx mul mulst neg nop not or pop popa popac popad popfd push pusha pushac pushad pushf pushfd rep ret ret rol ror sbb shl shr spi stc std stos stosb stosd stosw sub subst swap test xchg xlat xor
+registers=eax ax al ah ebx bx bl bh ecx cx cl ch edx dx dl dh di edi si esi bp ebp esp sp .data .text .bss _start
+directives=org list nolist page equivalent word text equ section global extern %macro %endmacro db movsb stosb resb byte %1 %2 %3 %4 %5 %6 %7 %8 %9 %10
+
+
+[settings]
+# default extension used when saving files
+extension=asm
+
+# the following characters are these which a "word" can contains, see documentation
+#wordchars=_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+
+# single comments, like # in this file
+comment_single=;
+# multiline comments
+#comment_open=
+#comment_close=
+
+# set to false if a comment character/string should start at column 0 of a line, true uses any
+# indentation of the line, e.g. setting to true causes the following on pressing CTRL+d
+	#command_example();
+# setting to false would generate this
+#	command_example();
+# This setting works only for single line comments
+comment_use_indent=true
+
+# context action command (please see Geany's main documentation for details)
+context_action_cmd=
+
+[indentation]
+#width=4
+# 0 is spaces, 1 is tabs, 2 is tab & spaces
+#type=0
+
+[build_settings]
+# %f will be replaced by the complete filename
+# %e will be replaced by the filename without extension
+# (use only one of it at one time)
+compiler=nasm "%f"
