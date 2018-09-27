@@ -2,6 +2,9 @@
  * This is an instruction booklet that shows you how to build a text editor in C.
  *
  * https://viewsourcecode.org/snaptoken/kilo/index.html
+ * Compeleted
+ *  Chap 1: Setup
+ *  Chap 2: Entering Raw Mode
  *
  */
 
