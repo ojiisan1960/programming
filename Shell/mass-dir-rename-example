@@ -1,0 +1,8 @@
+This was used to rename all folders in a git repo
+from chNN to chapterNN
+
+for i in $(ls | grep -E ch[0-9][0-9]) 
+do 
+	git mv ${i} chapter${i##ch}
+
+done
