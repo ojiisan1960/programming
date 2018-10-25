@@ -1,3 +1,4 @@
 
 *.out
+.gdb_history
 C/build_an_editor/kilo
